@@ -6,13 +6,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+import json as _json
+
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 
 from config import DATA_DIR
-from agents.coordinator_agent import run_full_analysis
+from agents.coordinator_agent import run_full_analysis, stream_pipeline_events
 from agents.memory_agent import load_history
 
 
@@ -97,6 +99,31 @@ def analyze(req: AnalyzeRequest):
         return result.model_dump(mode="json")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/analyze/stream")
+async def analyze_stream(req: AnalyzeRequest):
+    """Stream analysis results as NDJSON, one event per agent completion."""
+    ticker = req.ticker.strip().upper()[:10]
+    if not ticker:
+        raise HTTPException(status_code=422, detail="Ticker cannot be empty")
+
+    if req.mode not in ("live", "offline"):
+        raise HTTPException(status_code=422, detail="mode must be 'live' or 'offline'")
+    if req.mode == "offline":
+        raise HTTPException(status_code=422, detail="Use /analyze/upload for offline mode")
+
+    async def _generate():
+        async for event in stream_pipeline_events(
+            ticker=ticker,
+            question=req.question,
+            mode="live",
+            days_back=req.days_back,
+            run_debate_flag=req.run_debate,
+        ):
+            yield _json.dumps(event) + "\n"
+
+    return StreamingResponse(_generate(), media_type="application/x-ndjson")
 
 
 @app.post("/analyze/upload")

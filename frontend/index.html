@@ -58,6 +58,23 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 @keyframes spin{to{transform:rotate(360deg);}}
 .loading-msg{margin-top:20px;color:var(--text2);font-size:0.95rem;text-align:center;}
 
+/* PROGRESS BAR */
+.progress-bar{margin-top:24px;display:flex;flex-direction:column;gap:6px;min-width:320px;}
+.prog-agent{display:flex;align-items:center;gap:10px;font-size:0.82rem;}
+.prog-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;background:#2a2a3a;transition:background 0.3s;}
+.prog-dot.running{background:var(--blue);box-shadow:0 0 6px var(--blue);animation:pulse 1s ease-in-out infinite;}
+.prog-dot.done{background:var(--green);}
+.prog-dot.error{background:var(--red);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+.prog-label{color:var(--text2);transition:color 0.3s;}
+.prog-label.running{color:var(--text);}
+.prog-label.done{color:var(--green);}
+.prog-label.error{color:var(--red);}
+
+/* SKELETON (placeholder while streaming) */
+.skeleton{background:linear-gradient(90deg,#1a1a24 25%,#22223a 50%,#1a1a24 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;height:1em;margin:4px 0;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
 /* RESULTS */
 .results-panel{display:none;padding:80px 24px 40px;max-width:1200px;margin:0 auto;overflow:visible !important;height:auto !important;}
 .back-btn{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--border);color:var(--text2);padding:8px 16px;border-radius:8px;font-family:inherit;font-size:0.85rem;cursor:pointer;margin-bottom:20px;transition:all 0.2s;}
@@ -178,7 +195,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <!-- LOADING -->
 <div class="loading-overlay" id="loadingOverlay">
   <div class="spinner"></div>
-  <div class="loading-msg" id="loadingMsg">Retrieving evidence from knowledge base...</div>
+  <div class="loading-msg" id="loadingMsg">Starting analysis...</div>
+  <div class="progress-bar" id="progressBar">
+    <div class="prog-agent"><div class="prog-dot" id="dot-research"></div><span class="prog-label" id="lbl-research">Research Agent</span></div>
+    <div class="prog-agent"><div class="prog-dot" id="dot-trend"></div><span class="prog-label" id="lbl-trend">Trend Agent</span></div>
+    <div class="prog-agent"><div class="prog-dot" id="dot-sentiment"></div><span class="prog-label" id="lbl-sentiment">Sentiment Agent</span></div>
+    <div class="prog-agent"><div class="prog-dot" id="dot-risk"></div><span class="prog-label" id="lbl-risk">Risk Agent</span></div>
+    <div class="prog-agent"><div class="prog-dot" id="dot-analyst"></div><span class="prog-label" id="lbl-analyst">Analyst Agent</span></div>
+    <div class="prog-agent" id="prog-debate"><div class="prog-dot" id="dot-debate"></div><span class="prog-label" id="lbl-debate">Debate Agent</span></div>
+    <div class="prog-agent"><div class="prog-dot" id="dot-memory"></div><span class="prog-label" id="lbl-memory">Memory Agent</span></div>
+  </div>
 </div>
 
 <!-- RESULTS -->
@@ -267,21 +293,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 const API_BASE = "http://localhost:8000";
 
 let currentData = null;
-let loadingInterval = null;
 let selectedDays = 365;
 let trendChartInst = null;
 let sentChartInst = null;
 let riskChartInst = null;
-
-const loadingMessages = [
-  "Retrieving evidence from knowledge base...",
-  "Computing trend signals...",
-  "Analyzing sentiment...",
-  "Evaluating risk factors...",
-  "Running bull vs bear debate...",
-  "Generating investment memo...",
-  "Finalizing analysis..."
-];
 
 // ── Helpers ────────────────────────────────────────────
 
@@ -293,19 +308,13 @@ function selectDays(d) {
 }
 
 function showLoading() {
-  const overlay = document.getElementById('loadingOverlay');
-  overlay.classList.add('show');
-  let idx = 0;
-  document.getElementById('loadingMsg').textContent = loadingMessages[0];
-  loadingInterval = setInterval(() => {
-    idx = (idx + 1) % loadingMessages.length;
-    document.getElementById('loadingMsg').textContent = loadingMessages[idx];
-  }, 1500);
+  resetProgress();
+  document.getElementById('loadingOverlay').classList.add('show');
+  document.getElementById('loadingMsg').textContent = 'Starting analysis...';
 }
 
 function hideLoading() {
   document.getElementById('loadingOverlay').classList.remove('show');
-  if (loadingInterval) { clearInterval(loadingInterval); loadingInterval = null; }
 }
 
 function formatDate(iso) {
@@ -318,16 +327,33 @@ function formatDate(iso) {
 
 function getCitationHighlightedText(text) {
   if (!text) return '';
-  // Escape HTML first to prevent injection
   const escaped = text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
-  // Now highlight citation IDs like E1, E2 etc
-  return escaped.replace(
-    /\b(E\d+)\b/g,
-    '<span style="color:#3b82f6;font-weight:600;">$1</span>'
-  );
+  return escaped.replace(/\b(E\d+)\b/g, '<span style="color:#3b82f6;font-weight:600;">$1</span>');
+}
+
+// ── Progress bar ───────────────────────────────────────
+
+const AGENT_LABELS = {
+  research: 'Research Agent', trend: 'Trend Agent', sentiment: 'Sentiment Agent',
+  risk: 'Risk Agent', analyst: 'Analyst Agent', debate: 'Debate Agent', memory: 'Memory Agent'
+};
+
+function resetProgress() {
+  Object.keys(AGENT_LABELS).forEach(a => setAgentStatus(a, 'idle'));
+}
+
+function setAgentStatus(agent, status) {
+  const dot = document.getElementById(`dot-${agent}`);
+  const lbl = document.getElementById(`lbl-${agent}`);
+  if (!dot || !lbl) return;
+  dot.className = 'prog-dot' + (status !== 'idle' ? ` ${status}` : '');
+  lbl.className = 'prog-label' + (status !== 'idle' ? ` ${status}` : '');
+  if (status === 'running') {
+    document.getElementById('loadingMsg').textContent = `Running ${AGENT_LABELS[agent] || agent}...`;
+  }
 }
 
 // ── Error helper ───────────────────────────────────────
@@ -343,31 +369,82 @@ function showError(message) {
   }
 }
 
-// ── Analyze ────────────────────────────────────────────
+// ── Stream handler ─────────────────────────────────────
+// Accumulates partial agent data during streaming; renders panels as data arrives.
 
-async function analyze() {
-  const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
-  if (!ticker) {
-    showError('Please enter a ticker symbol');
+let _streamData = {};
+
+function _handleStreamEvent(event) {
+  const { event: type, agent, data, message } = event;
+
+  if (type === 'running') {
+    setAgentStatus(agent, 'running');
     return;
   }
 
+  if (type === 'error') {
+    setAgentStatus(agent, 'error');
+    return;
+  }
+
+  if (type === 'done') {
+    setAgentStatus(agent, 'done');
+    _streamData[agent] = data;
+
+    // Show results panel as soon as first agent completes
+    const panel = document.getElementById('resultsPanel');
+    if (panel.style.display !== 'block') {
+      document.getElementById('inputPanel').style.display = 'none';
+      panel.style.display = 'block';
+      window.scrollTo(0, 0);
+    }
+
+    // Progressive rendering — render each panel as its data arrives
+    if (agent === 'trend' && data) renderTrendChart(data.signals || []);
+    if (agent === 'sentiment' && data) renderSentimentGauge(data);
+    if (agent === 'risk' && data) renderRiskDonut(data);
+    if (agent === 'debate' && data) renderDebate(data);
+    if (agent === 'research' && data) renderEvidenceTable(data.evidence || [], {});
+    if (agent === 'analyst' && data) renderMemoSections(data);
+    if (agent === 'memory' && data) renderMemory(data);
+
+    // Update evidence sentiment overlay once both research+sentiment are done
+    if ((agent === 'research' || agent === 'sentiment') && _streamData.research && _streamData.sentiment) {
+      renderEvidenceTable(_streamData.research.evidence || [], _streamData.sentiment);
+    }
+    return;
+  }
+
+  if (type === 'complete') {
+    currentData = data;
+    // Final render with the complete merged schema
+    renderResults(data);
+    hideLoading();
+    return;
+  }
+}
+
+// ── Analyze (streaming) ────────────────────────────────
+
+async function analyze() {
+  const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
+  if (!ticker) { showError('Please enter a ticker symbol'); return; }
+
   const btn = document.getElementById('analyzeBtn');
   btn.disabled = true;
+  _streamData = {};
   showLoading();
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 90000);
+  const timeoutId = setTimeout(() => controller.abort(), 120000);
 
   try {
-    const response = await fetch(`${API_BASE}/analyze`, {
+    const response = await fetch(`${API_BASE}/analyze/stream`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        ticker: ticker,
-        question: 'What are the key catalysts and risks?',
-        mode: 'live',
-        days_back: selectedDays,
+        ticker, question: 'What are the key catalysts and risks?',
+        mode: 'live', days_back: selectedDays,
         run_debate: document.getElementById('debateToggle').checked
       }),
       signal: controller.signal
@@ -376,20 +453,39 @@ async function analyze() {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      const err = await response.json().catch(() => ({detail:'Server error'}));
+      const err = await response.json().catch(() => ({detail: 'Server error'}));
       throw new Error(err.detail || 'Analysis failed');
     }
 
-    const data = await response.json();
-    currentData = data;
-    hideLoading();
-    renderResults(data);
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // keep incomplete last line
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        try {
+          _handleStreamEvent(JSON.parse(line));
+        } catch (e) {
+          console.warn('Bad NDJSON line:', line, e);
+        }
+      }
+    }
+    // flush remaining buffer
+    if (buffer.trim()) {
+      try { _handleStreamEvent(JSON.parse(buffer)); } catch {}
+    }
 
   } catch (err) {
     clearTimeout(timeoutId);
     hideLoading();
     if (err.name === 'AbortError') {
-      showError('Analysis timed out after 90 seconds. Please try again.');
+      showError('Analysis timed out. Please try again.');
     } else {
       showError(`Error: ${err.message}`);
     }
@@ -407,56 +503,122 @@ function resetToInput() {
   if (sentChartInst) { sentChartInst.destroy(); sentChartInst = null; }
   if (riskChartInst) { riskChartInst.destroy(); riskChartInst = null; }
   currentData = null;
+  _streamData = {};
+}
+
+// ── Progressive panel renderers ────────────────────────
+
+function renderMemoSections(memo) {
+  if (!memo) return;
+  // Hero
+  document.getElementById('heroTicker').textContent = memo.ticker || '';
+  document.getElementById('heroSub').textContent = (memo.ticker || '') + ' Analysis • ' + formatDate(memo.as_of);
+  const sig = (memo.action || {}).signal || 'hold';
+  const sigClass = {buy:'action-buy',hold:'action-hold',sell:'action-sell',watch:'action-watch'}[sig] || 'action-hold';
+  document.getElementById('heroAction').innerHTML = `<span class="action-badge ${sigClass}">${sig.toUpperCase()}</span>`;
+  document.getElementById('heroConf').textContent = `Confidence: ${Math.round(((memo.action || {}).confidence || 0) * 100)}%`;
+  const rl = memo.risk_level || 'moderate';
+  const rlClass = {low:'risk-low',moderate:'risk-moderate',high:'risk-high'}[rl] || 'risk-moderate';
+  document.getElementById('heroRisk').innerHTML = `<span class="risk-badge ${rlClass}">${rl.toUpperCase()} RISK • ${Math.round(memo.risk_score || 0)}/100</span>`;
+  // Recommendation
+  const recoMap = {
+    buy:"Conditions appear favorable for a position.",
+    hold:"Current position is justified. Wait for clearer signals.",
+    sell:"Risk factors outweigh potential upside.",
+    watch:"Elevated risk detected. Monitor closely."
+  };
+  document.getElementById('recoText').textContent = recoMap[sig] || recoMap.hold;
+  // Thesis
+  const thesisEl = document.getElementById('thesisText');
+  thesisEl.innerHTML = getCitationHighlightedText(memo.thesis || '');
+  thesisEl.style.cssText = 'overflow:visible!important;height:auto!important;max-height:none!important;display:block!important;white-space:normal!important;word-wrap:break-word!important;';
+}
+
+function renderDebate(debate) {
+  if (!debate) {
+    document.getElementById('debateContent').innerHTML = '<div style="color:var(--text2);font-size:0.85rem;">Debate not available</div>';
+    return;
+  }
+  const bullHtml = (debate.bull.arguments || []).map(a => `<li>+ ${a}</li>`).join('');
+  const bearHtml = (debate.bear.arguments || []).map(a => `<li>- ${a}</li>`).join('');
+  const biasColor = {bullish:'var(--green)',bearish:'var(--red)',neutral:'var(--amber)'}[debate.final_bias] || 'var(--text2)';
+  document.getElementById('debateContent').innerHTML = `
+    <div class="debate-cols">
+      <div class="debate-col debate-bull"><h4>&#x1f7e2; Bull Case</h4><ul>${bullHtml}</ul></div>
+      <div class="debate-col debate-bear"><h4>&#x1f534; Bear Case</h4><ul>${bearHtml}</ul></div>
+    </div>
+    <div class="debate-verdict"><strong style="color:${biasColor}">${debate.final_bias.toUpperCase()}</strong> &mdash; ${debate.coordinator_verdict || ''}</div>`;
+}
+
+function renderEvidenceTable(evidence, sentiment) {
+  const sentItems = (sentiment && sentiment.items) ? sentiment.items : [];
+  const sentMap = {};
+  sentItems.forEach(s => { sentMap[s.citation_id] = s.label; });
+  if (!evidence.length) {
+    document.getElementById('evidenceArea').innerHTML = '<div style="color:var(--text2);font-size:0.85rem;">No evidence retrieved</div>';
+    return;
+  }
+  const rows = evidence.map(e => {
+    const s = sentMap[e.citation_id] || 'neutral';
+    const bc = {positive:'badge-positive',neutral:'badge-neutral',negative:'badge-negative'}[s];
+    const src = (e.source || e.filepath || 'Unknown').substring(0, 20);
+    const snippet = (e.snippet || '').substring(0, 100);
+    const dateDisplay = (!e.date || e.date === 'Unknown') ? '<span style="color:#94a3b8;font-style:italic;">No date</span>' : formatDate(e.date);
+    return `<tr><td class="ev-id">${e.citation_id}</td><td>${dateDisplay}</td><td>${src}</td><td><span class="badge ${bc}">${s}</span></td><td class="ev-snippet">${snippet}</td></tr>`;
+  }).join('');
+  document.getElementById('evidenceArea').innerHTML = `<table class="ev-table"><thead><tr><th>ID</th><th>Date</th><th>Source</th><th>Sentiment</th><th>Snippet</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderMemory(memory) {
+  const mc = document.getElementById('memoryCard');
+  if (!memory) { mc.style.display = 'none'; return; }
+  mc.style.display = 'block';
+  const daysAgo = memory.previous_as_of ? Math.max(0, Math.round((new Date(memory.current_as_of) - new Date(memory.previous_as_of)) / 86400000)) : null;
+  const prevLabel = daysAgo !== null ? `${daysAgo} day(s) ago` : 'First analysis';
+  let deltaHtml = 'N/A';
+  if (memory.risk_score_delta !== null && memory.risk_score_delta !== undefined) {
+    const d = memory.risk_score_delta;
+    const color = d > 0 ? 'var(--red)' : d < 0 ? 'var(--green)' : 'var(--text2)';
+    const arrow = d > 0 ? '&#9650;' : d < 0 ? '&#9660;' : '';
+    deltaHtml = `<span style="color:${color}">${arrow} ${d > 0 ? '+' : ''}${Math.round(d)} pts</span>`;
+  }
+  const sigHtml = memory.signal_changed ? `<span style="color:var(--amber)">Changed</span>` : `<span style="color:var(--text2)">Unchanged</span>`;
+  document.getElementById('memStats').innerHTML = `
+    <div class="mem-stat"><div class="mem-stat-label">Previous Analysis</div><div class="mem-stat-value">${prevLabel}</div></div>
+    <div class="mem-stat"><div class="mem-stat-label">Risk Score Change</div><div class="mem-stat-value">${deltaHtml}</div></div>
+    <div class="mem-stat"><div class="mem-stat-label">Signal</div><div class="mem-stat-value">${sigHtml}</div></div>`;
+  document.getElementById('memSummary').textContent = memory.summary || '';
 }
 
 // ── Render ─────────────────────────────────────────────
 
+// \u2500\u2500 Final render (called on complete event) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+
 function renderResults(data) {
   document.getElementById('inputPanel').style.display = 'none';
   document.getElementById('resultsPanel').style.display = 'block';
-  window.scrollTo(0, 0);
 
-  const memo = data.memo;
-  const risk = data.risk;
-  const trend = data.trend;
-  const sentiment = data.sentiment;
-  const debate = data.debate;
-  const research = data.research;
-  const memory = data.memory;
+  const { memo, risk, trend, sentiment, debate, research, memory } = data;
 
-  // HERO
-  document.getElementById('heroTicker').textContent = memo.ticker;
-  document.getElementById('heroSub').textContent = memo.ticker + ' Analysis \u2022 ' + formatDate(memo.as_of);
-  const sig = memo.action.signal;
-  const sigClass = {buy:'action-buy',hold:'action-hold',sell:'action-sell',watch:'action-watch'}[sig] || 'action-hold';
-  document.getElementById('heroAction').innerHTML = `<span class="action-badge ${sigClass}">${sig.toUpperCase()}</span>`;
-  document.getElementById('heroConf').textContent = `Confidence: ${Math.round(memo.action.confidence * 100)}%`;
-  const rlClass = {low:'risk-low',moderate:'risk-moderate',high:'risk-high'}[risk.risk_level] || 'risk-moderate';
-  document.getElementById('heroRisk').innerHTML = `<span class="risk-badge ${rlClass}">${risk.risk_level.toUpperCase()} RISK \u2022 ${Math.round(risk.risk_score)}/100</span>`;
+  renderMemoSections(memo);
+  renderTrendChart((trend || {}).signals || []);
+  renderSentimentGauge(sentiment || {});
+  renderRiskDonut(risk || {});
+  renderDebate(debate);
+  renderEvidenceTable((research || {}).evidence || [], sentiment || {});
+  renderMemory(memory);
 
-  // RECOMMENDATION
-  const recoMap = {
-    buy: "Conditions appear favorable for a position. Multiple signals align bullishly.",
-    hold: "Current position is justified. Wait for clearer directional signals.",
-    sell: "Risk factors outweigh potential upside. Consider reducing exposure.",
-    watch: "Elevated risk detected. Monitor closely before committing capital."
-  };
-  document.getElementById('recoText').textContent = recoMap[sig] || recoMap.hold;
-  const sig30 = (trend.signals || []).find(s => s.horizon === '30d');
+  // Recommendation reasons (needs risk + trend + sentiment together)
+  const sig = (memo && memo.action) ? memo.action.signal : 'hold';
+  const sig30 = ((trend || {}).signals || []).find(s => s.horizon === '30d');
   const reasons = [];
-  if (risk.flags && risk.flags.length > 0) reasons.push(risk.flags[0].message);
+  if (risk && risk.flags && risk.flags.length > 0) reasons.push(risk.flags[0].message);
   else reasons.push("Low risk environment");
   if (sig30) reasons.push(`Trend: ${sig30.trend_label} (${sig30.return_pct > 0 ? '+' : ''}${sig30.return_pct.toFixed(1)}% 30d return)`);
   else reasons.push("Trend data unavailable");
-  reasons.push(`Sentiment: ${sentiment.overall_label} (score ${sentiment.overall_score.toFixed(2)})`);
+  if (sentiment) reasons.push(`Sentiment: ${sentiment.overall_label} (score ${(sentiment.overall_score || 0).toFixed(2)})`);
   document.getElementById('recoReasons').innerHTML = reasons.map(r => `<li>${r}</li>`).join('');
 
-  // CHARTS
-  renderTrendChart(trend.signals || []);
-  renderSentimentGauge(sentiment);
-  renderRiskDonut(risk);
-
-  // TREND STATS
   if (sig30) {
     document.getElementById('trendStats').innerHTML =
       `<span>Volatility: ${sig30.volatility_pct.toFixed(1)}%</span><span>Max Drawdown: ${sig30.max_drawdown_pct.toFixed(1)}%</span>`;
@@ -464,85 +626,13 @@ function renderResults(data) {
     document.getElementById('trendStats').innerHTML = '<span>No 30d signal available</span>';
   }
 
-  // DEBATE
-  if (debate) {
-    const bullHtml = (debate.bull.arguments || []).map(a => `<li>+ ${a}</li>`).join('');
-    const bearHtml = (debate.bear.arguments || []).map(a => `<li>- ${a}</li>`).join('');
-    const biasColor = {bullish:'var(--green)',bearish:'var(--red)',neutral:'var(--amber)'}[debate.final_bias] || 'var(--text2)';
-    document.getElementById('debateContent').innerHTML = `
-      <div class="debate-cols">
-        <div class="debate-col debate-bull"><h4>&#x1f7e2; Bull Case</h4><ul>${bullHtml}</ul></div>
-        <div class="debate-col debate-bear"><h4>&#x1f534; Bear Case</h4><ul>${bearHtml}</ul></div>
-      </div>
-      <div class="debate-verdict"><strong style="color:${biasColor}">${debate.final_bias.toUpperCase()}</strong> &mdash; ${debate.coordinator_verdict || ''}</div>`;
-  } else {
-    document.getElementById('debateContent').innerHTML = '<div style="color:var(--text2);font-size:0.85rem;">Debate analysis not available</div>';
-  }
-
-  // THESIS
-  const thesisEl = document.getElementById('thesisText');
-  thesisEl.innerHTML = '';
-  const thesisContent = getCitationHighlightedText(memo.thesis || '');
-  thesisEl.innerHTML = thesisContent;
-  thesisEl.style.cssText = 'overflow:visible!important;height:auto!important;max-height:none!important;display:block!important;white-space:normal!important;word-wrap:break-word!important;';
-
-  // EVIDENCE TABLE
-  const evidence = research.evidence || [];
-  if (evidence.length === 0) {
-    document.getElementById('evidenceArea').innerHTML = '<div style="color:var(--text2);font-size:0.85rem;">No evidence retrieved</div>';
-  } else {
-    const sentItems = (sentiment.items || []);
-    const sentMap = {};
-    sentItems.forEach(s => { sentMap[s.citation_id] = s.label; });
-    let rows = evidence.map(e => {
-      const s = sentMap[e.citation_id] || 'neutral';
-      const bc = {positive:'badge-positive',neutral:'badge-neutral',negative:'badge-negative'}[s];
-      const src = (e.source || e.filepath || 'Unknown').substring(0, 20);
-      const snippet = (e.snippet || '').substring(0, 100);
-      const rawDate = e.date;
-      const dateDisplay = (!rawDate || rawDate === 'Unknown') ? '<span style="color:#94a3b8;font-style:italic;">No date</span>' : formatDate(rawDate);
-      return `<tr><td class="ev-id">${e.citation_id}</td><td>${dateDisplay}</td><td>${src}</td><td><span class="badge ${bc}">${s}</span></td><td class="ev-snippet">${snippet}</td></tr>`;
-    }).join('');
-    document.getElementById('evidenceArea').innerHTML = `<table class="ev-table"><thead><tr><th>ID</th><th>Date</th><th>Source</th><th>Sentiment</th><th>Snippet</th></tr></thead><tbody>${rows}</tbody></table>`;
-  }
-
-  // TRACE
   const traceBody = document.getElementById('traceBody');
   traceBody.classList.remove('open');
   document.getElementById('traceArrow').innerHTML = '&#9660;';
-  const pipeline_trace = data.pipeline_trace || [];
-  traceBody.innerHTML = pipeline_trace.map(t => {
+  traceBody.innerHTML = (data.pipeline_trace || []).map(t => {
     const cls = t.toUpperCase().includes('FAILED') ? 'trace-fail' : '';
     return `<div class="${cls}">${t}</div>`;
   }).join('');
-
-  // MEMORY
-  const mc = document.getElementById('memoryCard');
-  if (memory) {
-    mc.style.display = 'block';
-    const daysAgo = memory.previous_as_of ? Math.max(0, Math.round((new Date(memory.current_as_of) - new Date(memory.previous_as_of)) / 86400000)) : null;
-    const prevLabel = daysAgo !== null ? `${daysAgo} day(s) ago` : 'First analysis';
-    let deltaHtml = 'N/A';
-    if (memory.risk_score_delta !== null && memory.risk_score_delta !== undefined) {
-      const d = memory.risk_score_delta;
-      const color = d > 0 ? 'var(--red)' : d < 0 ? 'var(--green)' : 'var(--text2)';
-      const arrow = d > 0 ? '&#9650;' : d < 0 ? '&#9660;' : '';
-      deltaHtml = `<span style="color:${color}">${arrow} ${d > 0 ? '+' : ''}${Math.round(d)} pts</span>`;
-    }
-    let sigHtml;
-    if (memory.signal_changed) {
-      sigHtml = `<span style="color:var(--amber)">Changed</span>`;
-    } else {
-      sigHtml = `<span style="color:var(--text2)">Unchanged</span>`;
-    }
-    document.getElementById('memStats').innerHTML = `
-      <div class="mem-stat"><div class="mem-stat-label">Previous Analysis</div><div class="mem-stat-value">${prevLabel}</div></div>
-      <div class="mem-stat"><div class="mem-stat-label">Risk Score Change</div><div class="mem-stat-value">${deltaHtml}</div></div>
-      <div class="mem-stat"><div class="mem-stat-label">Signal</div><div class="mem-stat-value">${sigHtml}</div></div>`;
-    document.getElementById('memSummary').textContent = memory.summary || '';
-  } else {
-    mc.style.display = 'none';
-  }
 }
 
 // ── Charts ─────────────────────────────────────────────

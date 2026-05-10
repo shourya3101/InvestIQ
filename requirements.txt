@@ -1,0 +1,25 @@
+# Data
+yfinance
+pandas
+numpy
+
+# Vector DB & Embeddings
+chromadb
+sentence-transformers
+
+# NLP & Sentiment
+vaderSentiment
+
+# LLM Providers
+groq
+anthropic
+
+# API
+fastapi
+uvicorn
+python-multipart
+
+# Utilities
+python-dotenv
+pydantic
+requests

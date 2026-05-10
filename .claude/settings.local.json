@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(source venv/Scripts/activate)",
+      "Bash(python -c \"from core.schemas import DocumentSchema; print\\(''core.schemas OK''\\)\")",
+      "Bash(python -c \"from core.vector_store_manager import VectorStoreManager; print\\(''vector_store OK''\\)\")",
+      "Bash(python -c \"from agents.research_agent import run_research; print\\(''research_agent OK''\\)\")",
+      "Bash(python -c \"from agents.trend_agent import run_trend; print\\(''trend_agent OK''\\)\")",
+      "Bash(python -c \"from agents.analyst_agent import run_analyst_memo; print\\(''analyst_agent OK''\\)\")",
+      "Bash(python -c \":*)",
+      "Bash(python -c \"import openai; print\\(''openai'', openai.__version__\\)\")",
+      "Bash(netstat -ano)",
+      "Bash(findstr :8000)",
+      "Bash(taskkill /PID 35996 /F)",
+      "Bash(cmd /c \"taskkill /PID 35996 /F\")",
+      "Bash(.venvScriptspython.exe -c \":*)"
+    ]
+  }
+}

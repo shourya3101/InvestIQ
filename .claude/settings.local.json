@@ -13,7 +13,8 @@
       "Bash(findstr :8000)",
       "Bash(taskkill /PID 35996 /F)",
       "Bash(cmd /c \"taskkill /PID 35996 /F\")",
-      "Bash(.venvScriptspython.exe -c \":*)"
+      "Bash(.venvScriptspython.exe -c \":*)",
+      "Bash(git add *)"
     ]
   }
 }

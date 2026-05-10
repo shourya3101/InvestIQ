@@ -2,6 +2,8 @@
 Document Loader for the URECA research system.
 
 Loads TXT and CSV files, returning validated DocumentSchema objects.
+Long documents are split into overlapping 800-character windows so that
+retrieval quality stays high even for multi-page Bloomberg exports.
 """
 
 from __future__ import annotations
@@ -14,6 +16,43 @@ from typing import Optional, Tuple, Union
 import pandas as pd
 
 from core.schemas import DocumentSchema
+
+# ── Chunking constants ────────────────────────────────────────────────────────
+
+CHUNK_SIZE = 800
+CHUNK_OVERLAP = 100
+
+
+# ── Sliding-window chunker ────────────────────────────────────────────────────
+
+
+def chunk_text(
+    text: str,
+    size: int = CHUNK_SIZE,
+    overlap: int = CHUNK_OVERLAP,
+) -> list[str]:
+    """Split *text* into overlapping windows of *size* characters.
+
+    Adjacent windows share *overlap* characters so that sentences that fall
+    on a boundary appear in full in at least one chunk.
+
+    Returns an empty list for empty input; a single-element list when
+    ``len(text) <= size``.
+    """
+    if not text:
+        return []
+    if len(text) <= size:
+        return [text]
+    step = size - overlap
+    chunks: list[str] = []
+    start = 0
+    while start < len(text):
+        end = start + size
+        chunks.append(text[start:end])
+        if end >= len(text):
+            break
+        start += step
+    return chunks
 
 
 def _extract_ticker_and_date_from_text(
@@ -216,6 +255,42 @@ class DocumentLoader:
             documents.append(doc)
 
         return documents
+
+    def chunk_documents(
+        self,
+        docs: list[DocumentSchema],
+        chunk_size: int = CHUNK_SIZE,
+        overlap: int = CHUNK_OVERLAP,
+    ) -> list[DocumentSchema]:
+        """Split each document's content into overlapping windows.
+
+        Every chunk inherits the ticker, date, source, and filepath of its
+        parent document so that retrieval metadata is preserved end-to-end.
+
+        Short documents (content length ≤ chunk_size) are returned as a
+        single-element list — no copying or truncation occurs.
+
+        Args:
+            docs: Documents to chunk.
+            chunk_size: Maximum characters per window (default 800).
+            overlap: Characters shared between adjacent windows (default 100).
+
+        Returns:
+            Flat list of DocumentSchema chunks (≥ len(docs) items).
+        """
+        result: list[DocumentSchema] = []
+        for doc in docs:
+            for window in chunk_text(doc.content, chunk_size, overlap):
+                result.append(
+                    DocumentSchema(
+                        content=window,
+                        source=doc.source,
+                        ticker=doc.ticker,
+                        date=doc.date,
+                        filepath=doc.filepath,
+                    )
+                )
+        return result
 
     def load_pdf(self, filepath: Union[str, Path]) -> list[DocumentSchema]:
         """

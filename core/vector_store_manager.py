@@ -129,6 +129,33 @@ class VectorStoreManager:
 
         return len(ids)
 
+    def add_documents_chunked(
+        self,
+        docs: list[DocumentSchema],
+        chunk_size: int = 800,
+        overlap: int = 100,
+    ) -> int:
+        """Chunk *docs* then upsert all windows into the vector store.
+
+        Each chunk inherits the ticker, date, source, and filepath of its
+        parent document.  Short documents (content ≤ chunk_size) are stored
+        as a single chunk — identical to calling ``add_documents`` directly.
+
+        Args:
+            docs: Source documents to chunk and ingest.
+            chunk_size: Maximum characters per chunk (default 800).
+            overlap: Characters shared between adjacent chunks (default 100).
+
+        Returns:
+            Number of chunk documents upserted.
+        """
+        if not docs:
+            return 0
+        # Lazy import avoids circular dependency at module load time.
+        from core.document_loader import DocumentLoader
+        chunks = DocumentLoader().chunk_documents(docs, chunk_size=chunk_size, overlap=overlap)
+        return self.add_documents(chunks)
+
     # ── retrieval ─────────────────────────────────────────────────────────
 
     def query(

@@ -33,7 +33,7 @@ gather(Research + Trend) → Sentiment → Risk → gather(Analyst + Debate) →
 ## Fixes Remaining
 - [x] Fix 4: Thesis cutoff — split analyst into 3 smaller LLM calls (max_tokens=1500 each, 33 tests)
 - [x] Fix 5: Swap VADER for FinBERT sentiment (singleton, VADER fallback, 34 tests)
-- [ ] Fix 6: Better document chunking (sliding window 800 chars, 100 overlap)
+- [x] Fix 6: Better document chunking (sliding window 800 chars, 100 overlap, 29 tests)
 - [ ] Fix 7: Progressive frontend loading (streaming per agent)
 - [ ] Fix 8: Production readiness (logging, caching, rate limiting, Docker)
 

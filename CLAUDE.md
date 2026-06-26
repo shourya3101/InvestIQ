@@ -35,7 +35,7 @@ gather(Research + Trend) → Sentiment → Risk → gather(Analyst + Debate) →
 - [x] Fix 5: Swap VADER for FinBERT sentiment (singleton, VADER fallback, 34 tests)
 - [x] Fix 6: Better document chunking (sliding window 800 chars, 100 overlap, 29 tests)
 - [x] Fix 7: Progressive frontend loading — NDJSON streaming, per-agent progress bar (195 tests)
-- [ ] Fix 8: Production readiness (logging, caching, rate limiting, Docker)
+- [x] Fix 8: Production readiness — structured logging, yfinance cache, slowapi rate limit, ticker validation, dev/prod config (234 tests)
 
 ## Known Issues
 - Thesis still cuts off mid-sentence (Fix 4 target)

@@ -1,11 +1,21 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 from typing import Optional, Union
 
 import pandas as pd
 import yfinance as yf
+
+# ── Per-day yfinance cache ────────────────────────────────────────────────────
+# Key: (ticker, date_iso, period, interval) → DataFrame copy
+_yfinance_cache: dict[tuple, pd.DataFrame] = {}
+
+
+def clear_yfinance_cache() -> None:
+    """Clear the in-process yfinance cache. Intended for tests."""
+    _yfinance_cache.clear()
 
 
 @dataclass
@@ -100,14 +110,17 @@ class MarketDataManager:
         period: Optional[str] = None,
         interval: Optional[str] = None,
     ) -> pd.DataFrame:
-        """
-        Fetch live OHLCV data from yfinance.
+        """Fetch live OHLCV data from yfinance, caching per ticker per day.
 
         Returns a DataFrame with standard columns:
         Date, Open, High, Low, Close, Volume
         """
         period = period or self.default_period
         interval = interval or self.default_interval
+
+        cache_key = (ticker, date.today().isoformat(), period, interval)
+        if cache_key in _yfinance_cache:
+            return _yfinance_cache[cache_key].copy()
 
         df = yf.download(
             ticker,
@@ -120,13 +133,11 @@ class MarketDataManager:
         if df is None or df.empty:
             raise ValueError(f"No yfinance data returned for ticker='{ticker}'")
 
-        # Normalize format: move index to a 'Date' column
         df = df.reset_index()
-
-        # Apply normalization to ensure standard schema
         df = self._normalize_price_df(df)
 
-        return df
+        _yfinance_cache[cache_key] = df
+        return df.copy()
 
     def load_offline_data(self, filepath: Union[str, Path]) -> pd.DataFrame:
         """

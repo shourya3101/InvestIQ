@@ -15,7 +15,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+import logging
 from config import MEMO_HISTORY_DIR
+
+logger = logging.getLogger(__name__)
 from core.schemas import (
     InvestmentMemoSchema,
     MemoHistoryEntrySchema,
@@ -62,7 +65,7 @@ def save_memo(memo: InvestmentMemoSchema) -> None:
         with open(filepath, "a", encoding="utf-8") as f:
             f.write(line + "\n")
     except Exception as exc:
-        print(f"[WARNING] memory_agent.save_memo failed for {memo.ticker}: {exc}")
+        logger.warning("save_memo failed for %s: %s", memo.ticker, exc)
 
 
 def load_history(ticker: str, n: int = 10) -> list[MemoHistoryEntrySchema]:
@@ -90,7 +93,7 @@ def load_history(ticker: str, n: int = 10) -> list[MemoHistoryEntrySchema]:
 
         return entries[-n:]
     except Exception as exc:
-        print(f"[WARNING] memory_agent.load_history failed for {ticker}: {exc}")
+        logger.warning("load_history failed for %s: %s", ticker, exc)
         return []
 
 

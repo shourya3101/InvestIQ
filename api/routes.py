@@ -1,30 +1,41 @@
 from __future__ import annotations
 
+import json as _json
+import re
 import shutil
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-import json as _json
-
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, Request, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
 from config import DATA_DIR
 from agents.coordinator_agent import run_full_analysis, stream_pipeline_events
 from agents.memory_agent import load_history
 
 
-# ── App setup ────────────────────────────────────────────────────────
+# ── Rate limiter ──────────────────────────────────────────────────────
+
+limiter = Limiter(key_func=get_remote_address)
+
+
+# ── App setup ─────────────────────────────────────────────────────────
 
 app = FastAPI(
     title="InvestIQ API",
     description="Multi-Agent Investment RAG System",
     version="1.0.0",
 )
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -35,7 +46,23 @@ app.add_middleware(
 )
 
 
-# ── Request models ───────────────────────────────────────────────────
+# ── Input validation ──────────────────────────────────────────────────
+
+_TICKER_RE = re.compile(r"^[A-Z0-9]{1,5}$")
+
+
+def validate_ticker(raw: str) -> str:
+    """Uppercase and validate *raw* ticker. Raises HTTP 422 on bad input."""
+    ticker = raw.strip().upper()
+    if not _TICKER_RE.match(ticker):
+        raise HTTPException(
+            status_code=422,
+            detail="Ticker must be 1-5 alphanumeric characters (A-Z, 0-9).",
+        )
+    return ticker
+
+
+# ── Request models ────────────────────────────────────────────────────
 
 class AnalyzeRequest(BaseModel):
     ticker: str
@@ -45,7 +72,7 @@ class AnalyzeRequest(BaseModel):
     run_debate: bool = True
 
 
-# ── Endpoints ────────────────────────────────────────────────────────
+# ── Endpoints ─────────────────────────────────────────────────────────
 
 @app.get("/")
 def root():
@@ -70,13 +97,10 @@ def health():
 
 
 @app.post("/analyze")
-def analyze(req: AnalyzeRequest):
-    # Validate ticker
-    ticker = req.ticker.strip().upper()[:10]
-    if not ticker:
-        raise HTTPException(status_code=422, detail="Ticker cannot be empty")
+@limiter.limit("10/minute")
+def analyze(request: Request, req: AnalyzeRequest):
+    ticker = validate_ticker(req.ticker)
 
-    # Validate mode
     if req.mode not in ("live", "offline"):
         raise HTTPException(
             status_code=422,
@@ -102,11 +126,10 @@ def analyze(req: AnalyzeRequest):
 
 
 @app.post("/analyze/stream")
-async def analyze_stream(req: AnalyzeRequest):
+@limiter.limit("10/minute")
+async def analyze_stream(request: Request, req: AnalyzeRequest):
     """Stream analysis results as NDJSON, one event per agent completion."""
-    ticker = req.ticker.strip().upper()[:10]
-    if not ticker:
-        raise HTTPException(status_code=422, detail="Ticker cannot be empty")
+    ticker = validate_ticker(req.ticker)
 
     if req.mode not in ("live", "offline"):
         raise HTTPException(status_code=422, detail="mode must be 'live' or 'offline'")
@@ -135,10 +158,7 @@ def analyze_upload(
     price_file: Optional[UploadFile] = File(default=None),
     news_file: Optional[UploadFile] = File(default=None),
 ):
-    # Validate ticker
-    ticker = ticker.strip().upper()[:10]
-    if not ticker:
-        raise HTTPException(status_code=422, detail="Ticker cannot be empty")
+    ticker = validate_ticker(ticker)
 
     raw_dir = Path(DATA_DIR) / "raw"
     raw_dir.mkdir(parents=True, exist_ok=True)
@@ -147,7 +167,6 @@ def analyze_upload(
     price_filepath: Optional[str] = None
 
     try:
-        # Save price file
         if price_file is not None:
             price_path = raw_dir / f"{ticker}_{int(time.time())}_prices.csv"
             with open(price_path, "wb") as f:
@@ -155,7 +174,6 @@ def analyze_upload(
             price_filepath = str(price_path)
             notes.append(f"Saved price file: {price_path.name}")
 
-        # Save and ingest news file
         if news_file is not None:
             news_path = raw_dir / f"{ticker}_{int(time.time())}_news.csv"
             with open(news_path, "wb") as f:

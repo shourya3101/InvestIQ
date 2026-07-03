@@ -64,6 +64,27 @@ GROQ_MODEL = "llama-3.3-70b-versatile"
 CLAUDE_MODEL = "claude-3-5-sonnet-latest"
 OPENAI_MODEL = "gpt-4o-mini"
 
+# ── Retrieval trust layer ────────────────────────────────────────────────────
+RETRIEVAL_FETCH_N = 30
+RERANK_MODEL_NAME = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+
+# PROVISIONAL thresholds — locked only after evaluation/calibrate_retrieval.py
+# is run and the user reviews the false-reject rate (spec §7). Do not tune by hand.
+ABOUTNESS_THRESHOLD = 0.3
+RERANK_THRESHOLD = 0.0
+
+MIN_SUFFICIENT_EVIDENCE = 3
+
+# Manual alias overrides checked before cache/yfinance (core/company_registry.py)
+COMPANY_ALIASES: dict[str, list[str]] = {
+    "AAPL": ["Apple", "Apple Inc"],
+    "MSFT": ["Microsoft", "Microsoft Corporation"],
+    "NVDA": ["Nvidia", "NVIDIA", "Nvidia Corporation"],
+    "GOOGL": ["Google", "Alphabet", "Alphabet Inc"],
+    "TSLA": ["Tesla", "Tesla, Inc."],
+}
+COMPANY_ALIASES_CACHE = DATA_DIR / "company_aliases.json"
+
 
 def llm_enabled() -> bool:
     """Return True when an LLM provider is configured."""

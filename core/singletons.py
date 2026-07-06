@@ -79,3 +79,42 @@ def reset_finbert_scorer(scorer=_FINBERT_NOT_INIT) -> None:
     """
     global _finbert_scorer
     _finbert_scorer = scorer
+
+
+# ── Cross-encoder re-ranker singleton ─────────────────────────────────────────
+
+# Sentinel: distinguishes "not yet attempted" from None ("load failed / gates-only")
+_RERANKER_NOT_INIT = object()
+_reranker = _RERANKER_NOT_INIT
+
+
+def _load_reranker():
+    """Load and return the CrossEncoder re-ranker.
+
+    Separated from get_reranker() so tests can patch this function without
+    importing sentence_transformers at module load time.
+    """
+    from sentence_transformers import CrossEncoder  # noqa: PLC0415
+    from config import RERANK_MODEL_NAME  # noqa: PLC0415
+    return CrossEncoder(RERANK_MODEL_NAME)
+
+
+def get_reranker():
+    """Return the shared CrossEncoder, loading it on first call.
+
+    Returns None when loading fails, which signals retrieval to fall back
+    to aboutness + cosine gating and cap evidence_status at "partial".
+    """
+    global _reranker
+    if _reranker is _RERANKER_NOT_INIT:
+        try:
+            _reranker = _load_reranker()
+        except Exception:
+            _reranker = None  # cache the failure → gates-only on every call
+    return _reranker
+
+
+def reset_reranker(reranker=_RERANKER_NOT_INIT) -> None:
+    """Replace or reset the cached re-ranker.  Intended for tests only."""
+    global _reranker
+    _reranker = reranker

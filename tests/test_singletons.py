@@ -91,12 +91,14 @@ def test_run_research_calls_query_on_provided_store():
 
 
 def test_run_research_does_not_call_get_store_when_store_is_provided():
+    # Store resolution now lives in core.retrieval; the singleton seam is
+    # core.singletons.get_store (imported lazily inside retrieve_evidence).
     from agents.research_agent import run_research
 
     mock_store = MagicMock()
     mock_store.query.return_value = []
 
-    with patch("agents.research_agent.get_store") as mock_get_store:
+    with patch("core.singletons.get_store") as mock_get_store:
         run_research("AAPL", "q", store=mock_store)
 
     mock_get_store.assert_not_called()
@@ -108,7 +110,7 @@ def test_run_research_calls_get_store_when_no_store_provided():
     mock_store = MagicMock()
     mock_store.query.return_value = []
 
-    with patch("agents.research_agent.get_store", return_value=mock_store) as mock_get_store:
+    with patch("core.singletons.get_store", return_value=mock_store) as mock_get_store:
         run_research("AAPL", "q")
 
     mock_get_store.assert_called_once()

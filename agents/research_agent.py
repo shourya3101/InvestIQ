@@ -1,17 +1,16 @@
 """
-Research Agent v2 using VectorStoreManager.
+Research Agent v3 — delegates retrieval policy to core.retrieval.
 
-Retrieves evidence from the vector store and packages it into strict
-Pydantic schemas (EvidenceSchema / ResearchOutputSchema).
-No LLM calls – this agent only retrieves and structures evidence.
+Packages gated evidence into ResearchOutputSchema, carrying the typed
+evidence_status so downstream agents can refuse to fabricate.
+No LLM calls — this agent only retrieves and structures evidence.
 """
 
-from datetime import datetime
 from typing import Optional
 
 from config import DEFAULT_TICKER
-from core.schemas import EvidenceSchema, ResearchOutputSchema
-from core.singletons import get_store
+from core.retrieval import retrieve_evidence
+from core.schemas import ResearchOutputSchema
 from core.vector_store_manager import VectorStoreManager
 
 
@@ -22,89 +21,30 @@ def run_research(
     top_k: int = 5,
     store: Optional[VectorStoreManager] = None,
 ) -> ResearchOutputSchema:
-    """
-    Query the vector store and return a validated ResearchOutputSchema.
-
-    Args:
-        ticker: Stock ticker to search for (e.g. "AAPL").
-        question: Natural-language research question.
-        days_back: How many days back to search (``None`` = all time).
-        top_k: Number of top results to retrieve.
-        store: Shared VectorStoreManager. Uses the process singleton if None.
-
-    Returns:
-        A ``ResearchOutputSchema`` with evidence items and a summary.
-    """
-
-    # ── resolve store (singleton if not injected) ─────────────────────────
-    if store is None:
-        store = get_store()
-
-    # ── query ─────────────────────────────────────────────────────────────
-    results = store.query(
-        ticker=ticker,
-        query_text=question,
-        top_k=top_k,
-        days_back=days_back,
-        allow_fallback=True,
-    )
-
-    # ── build evidence list ───────────────────────────────────────────────
-    evidence: list[EvidenceSchema] = []
-
-    for idx, r in enumerate(results, 1):
-        metadata = r["metadata"]
-        text = r["text"]
-        distance = r["distance"]
-
-        # similarity = 1 - distance, clamped to [0, 1]
-        similarity = max(0.0, min(1.0, 1.0 - distance))
-
-        # snippet: first 280 chars, stripped
-        snippet = text.strip()[:280]
-
-        # date: parse ISO string from metadata
-        raw_date = metadata.get("date", "")
-        parsed_date: Optional[datetime] = None
-        if raw_date:
-            try:
-                parsed_date = datetime.fromisoformat(raw_date)
-            except (ValueError, TypeError):
-                parsed_date = None
-
-        evidence.append(
-            EvidenceSchema(
-                citation_id=f"E{idx}",
-                snippet=snippet,
-                filepath=metadata.get("filepath", ""),
-                source=metadata.get("source", ""),
-                ticker=metadata.get("ticker", "") or None,
-                date=parsed_date,
-                similarity_score=round(similarity, 4),
-            )
-        )
-
-    # ── summary ───────────────────────────────────────────────────────────
-    if not evidence:
-        summary = f"No evidence found for {ticker}."
-    else:
-        all_time_filtered = all(r.get("time_filtered", False) for r in results)
-        if all_time_filtered:
-            summary = (
-                f"Using time-filtered evidence from the last {days_back} days."
-            )
-        else:
-            summary = (
-                f"No recent evidence found in last {days_back} days; "
-                f"using best available evidence (fallback)."
-            )
-
-    return ResearchOutputSchema(
+    """Run gated retrieval and return a validated ResearchOutputSchema."""
+    result = retrieve_evidence(
         ticker=ticker,
         question=question,
         days_back=days_back,
-        evidence=evidence,
+        top_k=top_k,
+        store=store,
+    )
+
+    if result.evidence_status == "insufficient":
+        summary = f"No trustworthy evidence found for {result.ticker}. {result.status_reason}"
+    elif result.evidence_status == "partial":
+        summary = f"Partial evidence for {result.ticker}. {result.status_reason}"
+    else:
+        summary = f"Sufficient evidence for {result.ticker}. {result.status_reason}"
+
+    return ResearchOutputSchema(
+        ticker=result.ticker,
+        question=question,
+        days_back=days_back,
+        evidence=result.evidence,
         summary=summary,
+        evidence_status=result.evidence_status,
+        status_reason=result.status_reason,
     )
 
 

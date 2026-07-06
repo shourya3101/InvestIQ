@@ -114,11 +114,6 @@ def retrieve_evidence(
         from core.singletons import get_store  # noqa: PLC0415 — avoid heavy import at module load
         store = get_store()
     company = _company if _company is not None else get_company(ticker)
-    if _reranker is _UNSET:
-        from core.singletons import get_reranker  # noqa: PLC0415
-        reranker = get_reranker()
-    else:
-        reranker = _reranker
 
     query_text = f"{company.name} ({ticker}): {question}"
 
@@ -142,6 +137,18 @@ def retrieve_evidence(
     n_about_rejected = n_total - len(survivors)
 
     # ── cross-encoder re-rank ────────────────────────────────────────────────
+    # Resolve the singleton lazily: never load the model when nothing survived
+    # the aboutness gate (and keep unit tests free of real model loads).
+    if _reranker is _UNSET:
+        if survivors:
+            from core.singletons import get_reranker  # noqa: PLC0415
+            reranker = get_reranker()
+        else:
+            reranker = None
+    else:
+        reranker = _reranker
+
+    had_rank_pool = bool(survivors)
     reranker_used = reranker is not None
     n_rerank_rejected = 0
     if reranker_used and survivors:
@@ -187,7 +194,7 @@ def retrieve_evidence(
     ]
     if stale_fallback:
         parts.append(f"All surviving evidence is older than {days_back} days (stale fallback).")
-    if not reranker_used:
+    if had_rank_pool and not reranker_used:
         parts.append("Cross-encoder re-ranker unavailable — cosine ordering only.")
     if company.source == "fallback":
         parts.append("Company aliases unavailable (offline) — ticker-only matching.")

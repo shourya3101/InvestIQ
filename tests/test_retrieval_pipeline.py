@@ -150,6 +150,16 @@ def test_days_back_none_means_no_time_preference():
     result = _run([_cand(ON_TOPIC + f" v{i}", date=STALE) for i in range(3)], days_back=None)
     assert result.evidence_status == "sufficient"
 
+def test_reranker_singleton_not_resolved_when_nothing_survives_gate():
+    # No survivors → nothing to rank → the 22MB model must never be loaded.
+    from unittest.mock import patch
+    with patch("core.singletons.get_reranker") as mock_get:
+        result = retrieve_evidence("TSLA", "q", store=_store([_cand(OFF_TOPIC)]),
+                                   _company=TSLA, days_back=30)
+    mock_get.assert_not_called()
+    assert result.evidence_status == "insufficient"
+    assert "re-ranker unavailable" not in result.status_reason
+
 
 # ── status_reason accounting ──────────────────────────────────────────────────
 

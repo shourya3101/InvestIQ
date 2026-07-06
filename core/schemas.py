@@ -19,6 +19,7 @@ class DocumentSchema(BaseModel):
     ticker: Optional[str] = None
     date: Optional[datetime] = None
     filepath: str
+    about_score: Optional[float] = None  # article-level aboutness (ingestion)
 
 
 class EvidenceSchema(BaseModel):
@@ -31,6 +32,8 @@ class EvidenceSchema(BaseModel):
     ticker: Optional[str] = None
     date: Optional[datetime] = None
     similarity_score: float
+    aboutness_score: Optional[float] = None   # company-mention gate score
+    relevance_score: Optional[float] = None   # cross-encoder score
 
 
 class ResearchOutputSchema(BaseModel):
@@ -41,6 +44,8 @@ class ResearchOutputSchema(BaseModel):
     days_back: Optional[int] = None
     evidence: List[EvidenceSchema] = Field(default_factory=list)
     summary: str
+    evidence_status: Literal["sufficient", "partial", "insufficient"] = "sufficient"
+    status_reason: str = ""
 
 
 # ── Trend agent schemas ──────────────────────────────────────────────────
@@ -90,6 +95,7 @@ class SentimentOutputSchema(BaseModel):
     overall_label: Literal["positive", "neutral", "negative"]
     items: List[SentimentItemSchema] = Field(default_factory=list)
     summary: str
+    data_status: Literal["ok", "no_data"] = "ok"
 
 
 # ── Risk agent schemas ──────────────────────────────────────────────────
@@ -120,7 +126,7 @@ class RiskOutputSchema(BaseModel):
 class ActionSignalSchema(BaseModel):
     """Schema for a single action signal with confidence."""
 
-    signal: Literal["buy", "hold", "sell", "watch"]
+    signal: Literal["buy", "hold", "sell", "watch", "no_view"]
     confidence: float  # 0-1
     rationale: str
 
@@ -141,6 +147,8 @@ class InvestmentMemoSchema(BaseModel):
     writer_mode: str  # "deterministic" | "groq" | "claude" | "auto"
     debate: Optional["DebateOutputSchema"] = None
     memory: Optional["MemoryComparisonSchema"] = None
+    evidence_status: Literal["sufficient", "partial", "insufficient"] = "sufficient"
+    debate_skipped_reason: Optional[str] = None
 
 
 # ─── Debate Agent Schemas ───────────────────────────────

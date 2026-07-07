@@ -12,7 +12,11 @@ from typing import Optional
 
 from config import DEFAULT_TICKER
 from agents.research_agent import run_research
-from core.schemas import SentimentItemSchema, SentimentOutputSchema
+from core.schemas import (
+    ResearchOutputSchema,
+    SentimentItemSchema,
+    SentimentOutputSchema,
+)
 from core.singletons import get_finbert_scorer
 from core.vector_store_manager import VectorStoreManager
 
@@ -78,6 +82,7 @@ def run_sentiment(
     window_days: int = 365,
     top_k: int = 5,
     store: Optional[VectorStoreManager] = None,
+    research: Optional[ResearchOutputSchema] = None,
     _scorer=_UNSET,
 ) -> SentimentOutputSchema:
     """Score sentiment for *ticker* using the Research Agent's evidence.
@@ -94,26 +99,44 @@ def run_sentiment(
         Maximum number of evidence items to retrieve.
     store : VectorStoreManager | None
         Shared vector store singleton (injected by coordinator).
+    research : ResearchOutputSchema | None
+        Evidence pack to score (coordinator passes its research output so
+        sentiment never re-retrieves). Omit to retrieve standalone.
     _scorer : callable | None | _UNSET
         Test-only. Pass a FakeScorer to bypass the real model.
         Pass None to force VADER. Omit to use the FinBERT singleton.
     """
-    # Resolve scorer: use production singleton unless explicitly overridden
+    # ── Resolve evidence pack (coordinator passes research; standalone retrieves) ──
+    if research is None:
+        research = run_research(
+            ticker=ticker,
+            question=question,
+            days_back=window_days,
+            top_k=top_k,
+            store=store,
+        )
+
+    # ── Refuse to score when there is nothing trustworthy to score ────────────
+    if research.evidence_status == "insufficient" or not research.evidence:
+        return SentimentOutputSchema(
+            ticker=ticker,
+            as_of=datetime.now(timezone.utc),
+            window_days=window_days,
+            overall_score=0.0,
+            overall_label="neutral",
+            items=[],
+            summary="No sentiment data — no trustworthy evidence to score.",
+            data_status="no_data",
+        )
+
+    # Resolve scorer below the guard so FinBERT is never loaded on the
+    # no-data path. Use the production singleton unless explicitly overridden.
     if _scorer is _UNSET:
         scorer = get_finbert_scorer()
     else:
         scorer = _scorer
 
     scorer_name = "FinBERT" if scorer is not None else "VADER"
-
-    # ── Retrieve evidence ─────────────────────────────────────────────
-    research = run_research(
-        ticker=ticker,
-        question=question,
-        days_back=window_days,
-        top_k=top_k,
-        store=store,
-    )
 
     # ── Score each evidence item ──────────────────────────────────────
     items: list[SentimentItemSchema] = []

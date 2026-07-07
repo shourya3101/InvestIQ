@@ -31,6 +31,7 @@ from llm.providers import GroqProvider, ClaudeProvider, LLMRouter, OpenAIProvide
 
 _MAX_TOKENS = 1500
 _VALID_SIGNALS = ("buy", "hold", "sell")
+_PARTIAL_CONFIDENCE_CAP = 0.6
 
 
 # ── Shared context dataclass ──────────────────────────────────────────────────
@@ -85,7 +86,7 @@ def _build_memo_context(
 # ── Call 1: thesis ────────────────────────────────────────────────────────────
 
 
-def _write_thesis(provider, ctx: _MemoContext) -> str:
+def _write_thesis(provider, ctx: _MemoContext, evidence_note: str = "") -> str:
     """One focused LLM call: returns a 5-7 sentence investment thesis string."""
     system = (
         "You are a senior equity analyst writing a concise investment memo. "
@@ -100,6 +101,7 @@ def _write_thesis(provider, ctx: _MemoContext) -> str:
         f"- Risk: {ctx.risk_level} (score {ctx.risk_score:.0f}/100)\n"
         f"- Risk flags: {ctx.risk_flags}\n\n"
         f"Evidence:\n{ctx.evidence_lines}\n\n"
+        f"{evidence_note}"
         f"Write ONLY the thesis paragraph. Use 5-7 complete sentences. "
         f"Do not truncate mid-sentence."
     )
@@ -115,6 +117,72 @@ def _write_thesis(provider, ctx: _MemoContext) -> str:
         f"(score {ctx.risk_score:.0f}/100) with "
         f"{ctx.sentiment_label} sentiment (score {ctx.sentiment_score:.2f}). "
         f"Trend: {ctx.trend_summary}."
+    )
+
+
+def _write_market_data_thesis(provider, ctx: _MemoContext, status_reason: str) -> str:
+    """Thesis for the insufficient-evidence path: market data only, no fabrication."""
+    system = (
+        "You are a senior equity analyst. Write only from the market data provided. "
+        "You have NO news or document evidence — do not invent company events, "
+        "products, or fundamentals. Use complete sentences, no bullets or headers."
+    )
+    user = (
+        f"Retrieval found no trustworthy evidence for {ctx.ticker} ({status_reason}).\n"
+        f"Write a 3-4 sentence market-data-only summary for {ctx.ticker}. "
+        f"State first that no reliable evidence was found and no investment view is taken.\n\n"
+        f"Market data:\n"
+        f"- Trend: {ctx.trend_summary}\n"
+        f"- Risk: {ctx.risk_level} (score {ctx.risk_score:.0f}/100)\n"
+        f"- Risk flags: {ctx.risk_flags}\n"
+    )
+    return provider.generate(system, user).strip()
+
+
+def _insufficient_memo(
+    ticker: str,
+    research: ResearchOutputSchema,
+    trend: TrendOutputSchema,
+    sentiment: SentimentOutputSchema,
+    risk: RiskOutputSchema,
+    question: str,
+    mode: str,
+) -> InvestmentMemoSchema:
+    """Degraded memo: genuine no-view, market-data claims only, no fabrication."""
+    ctx = _build_memo_context(ticker, research, trend, sentiment, risk)
+
+    thesis = ""
+    if mode in ("groq", "claude", "auto", "openai"):
+        try:
+            provider = _build_provider(mode)
+            thesis = _write_market_data_thesis(provider, ctx, research.status_reason)
+        except Exception:
+            thesis = ""
+    if not thesis:
+        thesis = (
+            f"No trustworthy evidence was retrieved for {ticker}; this report is "
+            f"based on market data only and takes no investment view. "
+            f"Trend: {ctx.trend_summary}. "
+            f"Risk: {ctx.risk_level} (score {ctx.risk_score:.0f}/100)."
+        )
+
+    return InvestmentMemoSchema(
+        ticker=ticker,
+        as_of=datetime.now(timezone.utc),
+        question=question,
+        thesis=thesis,
+        catalysts=[],
+        risks=[f.message for f in risk.flags] or ["No material risk flags triggered."],
+        action=ActionSignalSchema(
+            signal="no_view",
+            confidence=0.0,
+            rationale=f"No trustworthy evidence retrieved for {ticker}; declining to take a view.",
+        ),
+        citations=[],
+        risk_level=risk.risk_level,
+        risk_score=risk.risk_score,
+        writer_mode=mode,
+        evidence_status="insufficient",
     )
 
 
@@ -242,6 +310,17 @@ def run_analyst_memo(
     """Generate an investment memo using 3 focused LLM calls (or deterministic fallback)."""
     mode = writer_mode or LLM_MODE
     ctx = _build_memo_context(ticker, research, trend, sentiment, risk)
+
+    status = research.evidence_status
+    if status == "insufficient":
+        return _insufficient_memo(ticker, research, trend, sentiment, risk, question, mode)
+
+    evidence_note = (
+        f"NOTE: the evidence base is limited ({research.status_reason}) — "
+        f"explicitly acknowledge the limited evidence in the thesis.\n\n"
+        if status == "partial" else ""
+    )
+
     citations = [e.citation_id for e in research.evidence]
 
     # ── LLM path ──────────────────────────────────────────────────────
@@ -249,9 +328,11 @@ def run_analyst_memo(
         try:
             provider = _build_provider(mode)
 
-            thesis = _write_thesis(provider, ctx)
+            thesis = _write_thesis(provider, ctx, evidence_note)
             catalysts, risks = _write_catalysts_risks(provider, ctx)
             signal, confidence, rationale = _write_recommendation(provider, ctx)
+            if status == "partial":
+                confidence = min(confidence, _PARTIAL_CONFIDENCE_CAP)
 
             return InvestmentMemoSchema(
                 ticker=ticker,
@@ -269,6 +350,7 @@ def run_analyst_memo(
                 risk_level=risk.risk_level,
                 risk_score=risk.risk_score,
                 writer_mode=mode,
+                evidence_status=status,
             )
 
         except Exception:
@@ -291,6 +373,8 @@ def run_analyst_memo(
     risks = [f.message for f in risk.flags] or ["No material risk flags triggered."]
 
     signal, confidence, rationale = _deterministic_recommendation(ctx)
+    if status == "partial":
+        confidence = min(confidence, _PARTIAL_CONFIDENCE_CAP)
 
     return InvestmentMemoSchema(
         ticker=ticker,
@@ -308,6 +392,7 @@ def run_analyst_memo(
         risk_level=risk.risk_level,
         risk_score=risk.risk_score,
         writer_mode=mode,
+        evidence_status=status,
     )
 
 

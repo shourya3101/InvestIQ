@@ -13,7 +13,12 @@ from typing import Optional
 from config import DEFAULT_TICKER
 from agents.trend_agent import run_trend
 from agents.sentiment_agent import run_sentiment
-from core.schemas import RiskFlagSchema, RiskOutputSchema
+from core.schemas import (
+    RiskFlagSchema,
+    RiskOutputSchema,
+    SentimentOutputSchema,
+    TrendOutputSchema,
+)
 from core.vector_store_manager import VectorStoreManager
 
 
@@ -45,6 +50,8 @@ def run_risk(
     window_days: int = 365,
     top_k: int = 5,
     store: Optional[VectorStoreManager] = None,
+    trend: Optional[TrendOutputSchema] = None,
+    sentiment: Optional[SentimentOutputSchema] = None,
 ) -> RiskOutputSchema:
     """Assess risk for *ticker* by combining trend and sentiment signals.
 
@@ -62,24 +69,30 @@ def run_risk(
         Evidence look-back window for sentiment.
     top_k : int
         Max evidence items for sentiment scoring.
+    trend, sentiment :
+        Already-computed outputs (injected by the coordinator so nothing is
+        recomputed). Omit to compute standalone.
 
     Returns
     -------
     RiskOutputSchema
     """
-    # ── Gather sub-agent outputs ────────────────────────────────────
-    trend = run_trend(
-        ticker,
-        mode=mode,
-        filepath=price_filepath if mode == "offline" else None,
-    )
-    sent = run_sentiment(
-        ticker,
-        question=question,
-        window_days=window_days,
-        top_k=top_k,
-        store=store,
-    )
+    # ── Gather sub-agent outputs (reused when the coordinator injects them) ──
+    if trend is None:
+        trend = run_trend(
+            ticker,
+            mode=mode,
+            filepath=price_filepath if mode == "offline" else None,
+        )
+    sent = sentiment
+    if sent is None:
+        sent = run_sentiment(
+            ticker,
+            question=question,
+            window_days=window_days,
+            top_k=top_k,
+            store=store,
+        )
 
     # ── Pick the reference trend signal (prefer 30d) ────────────────
     sig = None
@@ -159,8 +172,16 @@ def run_risk(
         )
         risk_score += _RETURN_POINTS[sev]
 
-    # 4) Sentiment
-    if sent.overall_label == "negative":
+    # 4) Sentiment — absence of data is flagged, never scored as neutrality
+    if sent.data_status == "no_data":
+        flags.append(
+            RiskFlagSchema(
+                category="sentiment",
+                severity="low",
+                message="No sentiment data — insufficient trustworthy evidence.",
+            )
+        )
+    elif sent.overall_label == "negative":
         sev = "high" if sent.overall_score <= -0.3 else "moderate"
         flags.append(
             RiskFlagSchema(

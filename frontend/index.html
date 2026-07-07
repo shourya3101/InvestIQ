@@ -159,6 +159,21 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .mem-stat-label{font-size:0.72rem;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
 .mem-stat-value{font-size:1rem;font-weight:600;}
 .mem-summary{margin-top:14px;font-size:0.85rem;color:var(--text2);line-height:1.6;}
+
+/* EVIDENCE STATUS / DEGRADED MODE */
+.gap-card{border:1px solid rgba(245,158,11,0.55);background:rgba(245,158,11,0.07);}
+.gap-card.gap-insufficient{border-color:rgba(239,68,68,0.65);background:rgba(239,68,68,0.07);}
+.gap-title{font-size:1.15rem;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.gap-insufficient .gap-title{color:var(--red);}
+.gap-card:not(.gap-insufficient) .gap-title{color:var(--amber);}
+.gap-body{font-size:0.9rem;line-height:1.6;color:var(--text);}
+.gap-reason{margin-top:10px;font-size:0.78rem;color:var(--text2);font-family:'Courier New',monospace;}
+.action-no_view{background:rgba(148,163,184,0.15);color:var(--text2);border:1px dashed var(--text2);}
+[data-evidence-status="insufficient"] .muted-degraded{opacity:0.55;}
+[data-evidence-status="insufficient"] .card-title .mkt-tag{display:inline-block;}
+.mkt-tag{display:none;margin-left:8px;padding:2px 8px;border-radius:5px;font-size:0.65rem;font-weight:600;background:rgba(148,163,184,0.15);color:var(--text2);vertical-align:middle;}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:180px;color:var(--text2);font-size:0.9rem;gap:6px;text-align:center;}
+.empty-state .big{font-size:1.6rem;}
 </style>
 </head>
 <body>
@@ -211,6 +226,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <div class="results-panel" id="resultsPanel">
   <button class="back-btn" onclick="resetToInput()">&larr; New Analysis</button>
 
+  <!-- EVIDENCE GAP NOTICE (hidden unless status is partial/insufficient) -->
+  <div class="card gap-card" id="gapCard" style="display:none;">
+    <div class="gap-title" id="gapTitle"></div>
+    <div class="gap-body" id="gapBody"></div>
+    <div class="gap-reason" id="gapReason"></div>
+  </div>
+
   <!-- HERO -->
   <div class="card" id="heroCard">
     <div class="hero">
@@ -237,8 +259,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <!-- 2x2 GRID -->
   <div class="grid-2x2">
     <!-- TREND -->
-    <div class="card">
-      <div class="card-title">&#128200; Trend Signals</div>
+    <div class="card muted-degraded">
+      <div class="card-title">&#128200; Trend Signals<span class="mkt-tag">market data only</span></div>
       <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
       <div class="stat-row" id="trendStats"></div>
     </div>
@@ -250,8 +272,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="gauge-label-row" id="sentLabel"></div>
     </div>
     <!-- RISK -->
-    <div class="card">
-      <div class="card-title">&#9888;&#65039; Risk Assessment</div>
+    <div class="card muted-degraded">
+      <div class="card-title">&#9888;&#65039; Risk Assessment<span class="mkt-tag">market data only</span></div>
       <div class="chart-wrap"><canvas id="riskChart"></canvas></div>
       <div class="donut-center" id="riskValue"></div>
       <div id="riskFlagsArea"></div>
@@ -369,6 +391,35 @@ function showError(message) {
   }
 }
 
+// ── Evidence status (degraded rendering) ───────────────
+// Legacy payloads have no evidence_status → status null → render as before.
+
+function setEvidenceStatus(status, reason) {
+  const panel = document.getElementById('resultsPanel');
+  const gap = document.getElementById('gapCard');
+  if (!status || status === 'sufficient') {
+    panel.removeAttribute('data-evidence-status');
+    gap.style.display = 'none';
+    return;
+  }
+  panel.setAttribute('data-evidence-status', status);
+  gap.style.display = 'block';
+  gap.classList.toggle('gap-insufficient', status === 'insufficient');
+  if (status === 'insufficient') {
+    document.getElementById('gapTitle').innerHTML = '&#9888;&#65039; No trustworthy evidence found';
+    document.getElementById('gapBody').textContent =
+      'Retrieval rejected all candidate documents for this ticker — none were verifiably ' +
+      'about the company and relevant to the question. No investment view is taken. ' +
+      'The sections below reflect market data (price/volatility) only.';
+  } else {
+    document.getElementById('gapTitle').innerHTML = '&#9888;&#65039; Limited evidence';
+    document.getElementById('gapBody').textContent =
+      'Only a small amount of trustworthy evidence passed retrieval gates. ' +
+      'Confidence is capped and conclusions should be read with caution.';
+  }
+  document.getElementById('gapReason').textContent = reason || '';
+}
+
 // ── Stream handler ─────────────────────────────────────
 // Accumulates partial agent data during streaming; renders panels as data arrives.
 
@@ -387,6 +438,11 @@ function _handleStreamEvent(event) {
     return;
   }
 
+  if (type === 'skipped') {
+    setAgentStatus(agent, 'done');   // grey→green dot; the card explains the skip
+    return;
+  }
+
   if (type === 'done') {
     setAgentStatus(agent, 'done');
     _streamData[agent] = data;
@@ -399,18 +455,24 @@ function _handleStreamEvent(event) {
       window.scrollTo(0, 0);
     }
 
+    // Surface the evidence status as soon as research lands (before analyst)
+    if (agent === 'research' && data) {
+      setEvidenceStatus(data.evidence_status || null, data.status_reason || '');
+    }
+
     // Progressive rendering — render each panel as its data arrives
     if (agent === 'trend' && data) renderTrendChart(data.signals || []);
     if (agent === 'sentiment' && data) renderSentimentGauge(data);
     if (agent === 'risk' && data) renderRiskDonut(data);
     if (agent === 'debate' && data) renderDebate(data);
-    if (agent === 'research' && data) renderEvidenceTable(data.evidence || [], {});
+    if (agent === 'research' && data) renderEvidenceTable(data.evidence || [], {}, data.status_reason || '');
     if (agent === 'analyst' && data) renderMemoSections(data);
     if (agent === 'memory' && data) renderMemory(data);
 
     // Update evidence sentiment overlay once both research+sentiment are done
     if ((agent === 'research' || agent === 'sentiment') && _streamData.research && _streamData.sentiment) {
-      renderEvidenceTable(_streamData.research.evidence || [], _streamData.sentiment);
+      renderEvidenceTable(_streamData.research.evidence || [], _streamData.sentiment,
+                          (_streamData.research || {}).status_reason || '');
     }
     return;
   }
@@ -504,6 +566,7 @@ function resetToInput() {
   if (riskChartInst) { riskChartInst.destroy(); riskChartInst = null; }
   currentData = null;
   _streamData = {};
+  setEvidenceStatus(null, '');
 }
 
 // ── Progressive panel renderers ────────────────────────
@@ -514,9 +577,13 @@ function renderMemoSections(memo) {
   document.getElementById('heroTicker').textContent = memo.ticker || '';
   document.getElementById('heroSub').textContent = (memo.ticker || '') + ' Analysis • ' + formatDate(memo.as_of);
   const sig = (memo.action || {}).signal || 'hold';
-  const sigClass = {buy:'action-buy',hold:'action-hold',sell:'action-sell',watch:'action-watch'}[sig] || 'action-hold';
-  document.getElementById('heroAction').innerHTML = `<span class="action-badge ${sigClass}">${sig.toUpperCase()}</span>`;
-  document.getElementById('heroConf').textContent = `Confidence: ${Math.round(((memo.action || {}).confidence || 0) * 100)}%`;
+  const sigClass = {buy:'action-buy',hold:'action-hold',sell:'action-sell',
+                    watch:'action-watch',no_view:'action-no_view'}[sig] || 'action-hold';
+  const sigText = sig === 'no_view' ? 'NO VIEW' : sig.toUpperCase();
+  document.getElementById('heroAction').innerHTML = `<span class="action-badge ${sigClass}">${sigText}</span>`;
+  document.getElementById('heroConf').textContent = sig === 'no_view'
+    ? 'No view taken — insufficient evidence'
+    : `Confidence: ${Math.round(((memo.action || {}).confidence || 0) * 100)}%`;
   const rl = memo.risk_level || 'moderate';
   const rlClass = {low:'risk-low',moderate:'risk-moderate',high:'risk-high'}[rl] || 'risk-moderate';
   document.getElementById('heroRisk').innerHTML = `<span class="risk-badge ${rlClass}">${rl.toUpperCase()} RISK • ${Math.round(memo.risk_score || 0)}/100</span>`;
@@ -525,13 +592,20 @@ function renderMemoSections(memo) {
     buy:"Conditions appear favorable for a position.",
     hold:"Current position is justified. Wait for clearer signals.",
     sell:"Risk factors outweigh potential upside.",
-    watch:"Elevated risk detected. Monitor closely."
+    watch:"Elevated risk detected. Monitor closely.",
+    no_view:"No recommendation — retrieval found no trustworthy evidence for this ticker."
   };
   document.getElementById('recoText').textContent = recoMap[sig] || recoMap.hold;
   // Thesis
   const thesisEl = document.getElementById('thesisText');
   thesisEl.innerHTML = getCitationHighlightedText(memo.thesis || '');
   thesisEl.style.cssText = 'overflow:visible!important;height:auto!important;max-height:none!important;display:block!important;white-space:normal!important;word-wrap:break-word!important;';
+  // Debate skip is part of the report, not just the trace
+  if (memo.debate_skipped_reason) {
+    document.getElementById('debateContent').innerHTML =
+      `<div class="empty-state"><span class="big">&#9878;&#65039;</span>` +
+      `Debate skipped: ${memo.debate_skipped_reason}</div>`;
+  }
 }
 
 function renderDebate(debate) {
@@ -550,23 +624,32 @@ function renderDebate(debate) {
     <div class="debate-verdict"><strong style="color:${biasColor}">${debate.final_bias.toUpperCase()}</strong> &mdash; ${debate.coordinator_verdict || ''}</div>`;
 }
 
-function renderEvidenceTable(evidence, sentiment) {
+function renderEvidenceTable(evidence, sentiment, statusReason) {
   const sentItems = (sentiment && sentiment.items) ? sentiment.items : [];
   const sentMap = {};
   sentItems.forEach(s => { sentMap[s.citation_id] = s.label; });
   if (!evidence.length) {
-    document.getElementById('evidenceArea').innerHTML = '<div style="color:var(--text2);font-size:0.85rem;">No evidence retrieved</div>';
+    const reason = statusReason
+      ? `<div class="gap-reason" style="margin-top:8px;">${statusReason}</div>` : '';
+    document.getElementById('evidenceArea').innerHTML =
+      '<div style="color:var(--text2);font-size:0.85rem;">No trustworthy evidence passed retrieval gates</div>' + reason;
     return;
   }
+  const hasScores = evidence.some(e => e.relevance_score !== null && e.relevance_score !== undefined);
+  const scoreHead = hasScores ? '<th>Relevance</th><th>Aboutness</th>' : '';
   const rows = evidence.map(e => {
     const s = sentMap[e.citation_id] || 'neutral';
     const bc = {positive:'badge-positive',neutral:'badge-neutral',negative:'badge-negative'}[s];
     const src = (e.source || e.filepath || 'Unknown').substring(0, 20);
     const snippet = (e.snippet || '').substring(0, 100);
     const dateDisplay = (!e.date || e.date === 'Unknown') ? '<span style="color:#94a3b8;font-style:italic;">No date</span>' : formatDate(e.date);
-    return `<tr><td class="ev-id">${e.citation_id}</td><td>${dateDisplay}</td><td>${src}</td><td><span class="badge ${bc}">${s}</span></td><td class="ev-snippet">${snippet}</td></tr>`;
+    const scoreCells = hasScores
+      ? `<td>${e.relevance_score != null ? e.relevance_score.toFixed(2) : '—'}</td>` +
+        `<td>${e.aboutness_score != null ? e.aboutness_score.toFixed(2) : '—'}</td>`
+      : '';
+    return `<tr><td class="ev-id">${e.citation_id}</td><td>${dateDisplay}</td><td>${src}</td>${scoreCells}<td><span class="badge ${bc}">${s}</span></td><td class="ev-snippet">${snippet}</td></tr>`;
   }).join('');
-  document.getElementById('evidenceArea').innerHTML = `<table class="ev-table"><thead><tr><th>ID</th><th>Date</th><th>Source</th><th>Sentiment</th><th>Snippet</th></tr></thead><tbody>${rows}</tbody></table>`;
+  document.getElementById('evidenceArea').innerHTML = `<table class="ev-table"><thead><tr><th>ID</th><th>Date</th><th>Source</th>${scoreHead}<th>Sentiment</th><th>Snippet</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function renderMemory(memory) {
@@ -600,12 +683,18 @@ function renderResults(data) {
 
   const { memo, risk, trend, sentiment, debate, research, memory } = data;
 
+  setEvidenceStatus(
+    (research && research.evidence_status) || (memo && memo.evidence_status) || null,
+    (research && research.status_reason) || ''
+  );
+
   renderMemoSections(memo);
   renderTrendChart((trend || {}).signals || []);
   renderSentimentGauge(sentiment || {});
   renderRiskDonut(risk || {});
-  renderDebate(debate);
-  renderEvidenceTable((research || {}).evidence || [], sentiment || {});
+  // renderMemoSections already wrote the skip note; don't overwrite it
+  if (!(memo && memo.debate_skipped_reason)) renderDebate(debate);
+  renderEvidenceTable((research || {}).evidence || [], sentiment || {}, (research || {}).status_reason || '');
   renderMemory(memory);
 
   // Recommendation reasons (needs risk + trend + sentiment together)
@@ -661,6 +750,16 @@ function renderTrendChart(signals) {
 
 function renderSentimentGauge(sentiment) {
   if (sentChartInst) { sentChartInst.destroy(); sentChartInst = null; }
+  if (sentiment && sentiment.data_status === 'no_data') {
+    // Explicit empty state — a neutral-looking dial at 0.00 would be a lie.
+    document.getElementById('sentimentChart').style.display = 'none';
+    document.getElementById('sentValue').textContent = '';
+    document.getElementById('sentLabel').innerHTML =
+      '<div class="empty-state"><span class="big">&#128683;</span>No sentiment data<br>' +
+      '<span style="font-size:0.78rem;">no trustworthy evidence to score</span></div>';
+    return;
+  }
+  document.getElementById('sentimentChart').style.display = '';
   const ctx = document.getElementById('sentimentChart').getContext('2d');
   const score = sentiment.overall_score || 0;
   const norm = (score + 1) / 2;

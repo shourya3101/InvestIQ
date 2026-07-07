@@ -85,11 +85,12 @@ def test_article_level_metadata_rescues_pronoun_chunk():
 
 def test_rerank_gate_drops_low_scoring_survivors():
     # Aboutness passes both (both name Tesla); reranker only likes the first.
+    # Threshold injected explicitly — the gate must not depend on config values.
     class SplitReranker:
         def predict(self, pairs):
             return [8.0] + [-8.0] * (len(pairs) - 1)
     result = _run([_cand(ON_TOPIC), _cand("Tesla mentioned in unrelated crypto piece.")],
-                  reranker=SplitReranker())
+                  reranker=SplitReranker(), rerank_threshold=0.0)
     assert len(result.evidence) == 1
 
 def test_evidence_ordered_by_rerank_score_and_capped_at_top_k():
@@ -170,7 +171,7 @@ def test_status_reason_accounts_for_every_rejection():
     result = _run(
         [_cand(ON_TOPIC), _cand("Tesla in a weak crypto piece."),
          _cand(OFF_TOPIC), _cand(PASSING_MENTION)],
-        reranker=SplitReranker(),
+        reranker=SplitReranker(), rerank_threshold=0.0,
     )
     r = result.status_reason
     assert "4 candidates" in r

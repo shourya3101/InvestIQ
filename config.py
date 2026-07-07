@@ -68,10 +68,13 @@ OPENAI_MODEL = "gpt-4o-mini"
 RETRIEVAL_FETCH_N = 30
 RERANK_MODEL_NAME = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 
-# PROVISIONAL thresholds — locked only after evaluation/calibrate_retrieval.py
-# is run and the user reviews the false-reject rate (spec §7). Do not tune by hand.
+# Calibrated 2026-07-03 via evaluation/calibrate_retrieval.py (user-approved):
+# TSLA negatives admitted 0/5 (all score aboutness 0.00 — the aboutness gate
+# alone rejects them). Rerank −10.0 splits the observed junk cluster (≤ −10.2)
+# from genuine content (≥ −9.25); item-level FRR ≈ 12% (redundant AAPL items
+# only), zero change to any ticker's final evidence_status. Do not tune by hand.
 ABOUTNESS_THRESHOLD = 0.3
-RERANK_THRESHOLD = 0.0
+RERANK_THRESHOLD = -10.0
 
 MIN_SUFFICIENT_EVIDENCE = 3
 

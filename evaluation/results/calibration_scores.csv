@@ -1,0 +1,108 @@
+ticker,label,aboutness,rerank,cosine_sim,date,snippet
+AAPL,unlabeled,1.0,-0.3047,0.67,2025-01-25 00:00:00,Apple Inc. (AAPL) Financial Report Date: 2025-01-25  AAPL recently announced strong quarterly earnin
+AAPL,unlabeled,1.0,-0.3047,0.67,2025-01-25T00:00:00,Apple Inc. (AAPL) Financial Report Date: 2025-01-25  AAPL recently announced strong quarterly earnin
+AAPL,unlabeled,1.0,-0.3047,0.67,2025-01-25T00:00:00,Apple Inc. (AAPL) Financial Report Date: 2025-01-25  AAPL recently announced strong quarterly earnin
+AAPL,unlabeled,1.0,-3.9431,0.6552,2026-05-07T16:35:51,"Apple at $284: Buy, Sell or Hold? At $284, Apple (NASDAQ:AAPL) looks compelling at current levels. T"
+AAPL,unlabeled,1.0,-1.7569,0.6341,2026-05-06T19:01:49,"March Quarter Results Bolster Confidence in Apple Inc (AAPL) Stock If you click 'Accept all', we and"
+AAPL,unlabeled,0.75,-4.145,0.6136,2026-05-06T14:41:19,"Apple Just Discontinued Its Cheapest Mac Mini, but Wedbush Says It’s Good News for AAPL Stock If you"
+AAPL,unlabeled,0.75,2.1611,0.5686,unknown,Date: 2025-01-25 Ticker: AAPL Source: bloomberg_export Headline: Apple supply chain shows signs of s
+AAPL,unlabeled,1.0,-5.8015,0.5136,2026-05-05T20:48:57,"Apple shares hit new all-time closing high In Nasdaq trading today, shares of Apple Inc. rose to hit"
+AAPL,unlabeled,1.0,-10.2526,0.5037,2026-05-05T15:48:59,Apple Hammers The Competition The gold standard of smartphone industry research is CounterPoint. It 
+AAPL,unlabeled,1.0,-5.3958,0.4918,2026-05-07T00:48:01,"Apple shares hit new all-time closing high In Nasdaq trading today, shares of Apple Inc. rose to hit"
+AAPL,unlabeled,0.5,-10.1108,0.4764,,Date                           Headline 0  2025-07-24     Apple beats earnings estimates 1  2025/07/
+AAPL,unlabeled,1.0,-10.528,0.4521,2026-05-07T09:33:23,Apple Stock Buy or Sell in 2026? Strong Earnings Fuel Bullish Consensus as AI and iPhone Momentum Bu
+AAPL,unlabeled,1.0,-4.5054,0.4478,2026-05-08T17:15:24,Intel stock hits fourth straight record high as Apple report fuels chip rally Intel and Apple have r
+AAPL,unlabeled,1.0,-10.3631,0.3878,2026-05-05T16:07:00,Intel's Stock Surges to Fresh High on Deal Talks. Could Apple Be Its Next Customer? Intel shares soa
+AAPL,unlabeled,1.0,-11.1288,0.3852,2026-05-08T14:06:11,Wedbush raises Apple price target to $400 Apple stock rose about 0.8% on Friday after Wedbush Securi
+AAPL,unlabeled,1.0,-10.7354,0.3797,2026-05-06T00:33:09,Apple、M3 Ultraチップを搭載した「Mac Studio」のオプションから512GBメモリに続き256GBメモリを削除し、Mac miniも64GBメモリオプションが削除。 AppleがM3
+AAPL,unlabeled,1.0,-10.213,0.3414,2026-05-06T20:09:58,Apple agrees to $250M settlement over iPhone AI marketing claims Apple agreed to a $250M settlement 
+AAPL,unlabeled,0.0,-11.0831,0.2674,2026-05-07T15:05:56,"Corning Stock Is Surging on a Major Nvidia Deal: ‘AI Is Not Just a Technology Story, It Is a Manufac"
+AAPL,unlabeled,0.0,-11.3622,0.2067,2026-05-08T13:42:00,Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUB
+AAPL,unlabeled,0.0,-11.3617,0.2061,2026-05-08T13:12:00,Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUB
+AAPL,unlabeled,0.0,-11.3804,0.1134,2026-05-08T12:24:18,"algorithm-stat added to PyPI Unified quant-finance toolkit: market data, metrics, charts, Monte Carl"
+AAPL,unlabeled,0.0,-11.3581,0.1065,2026-05-06T16:29:00,"mcp-stockscreen added to PyPI MCP server for stock screening — technical, fundamental, options, news"
+AAPL,unlabeled,0.0,-11.4007,0.0387,2026-05-05T22:37:40,cbfin added to PyPI Python SDK for the hosted cbfin Cboe market-data API. Python SDK for the hosted 
+AAPL,unlabeled,0.0,-11.4878,0.0178,2026-05-06T20:58:23,"Show HN: Pay.sh – Discover, access, and pay for any API autonomously Article URL: https://github.com"
+AAPL,unlabeled,0.0,-11.4005,0.0,2026-05-06T13:58:33,fastspec added to PyPI Dynamic OpenAPI and discovery spec client for Python — turn any API spec into
+AAPL,unlabeled,0.0,-11.1064,0.0,unknown,Date 0    2025-07-24 1    2025-07-25 2    2025-07-28 3    2025-07-29 4    2025-07-30 5    2025-07-31
+AAPL,unlabeled,0.0,-11.1064,0.0,,Date 0    2025-07-24 1    2025-07-25 2    2025-07-28 3    2025-07-29 4    2025-07-30 5    2025-07-31
+MSFT,unlabeled,1.0,-0.9418,0.5873,2026-05-06T15:11:16,Microsoft Corporation (MSFT) Slid Amid Broad-Based Sell-Off in Software Companies If you click 'Acce
+MSFT,unlabeled,1.0,-1.6799,0.521,2026-05-06T18:50:16,Microsoft (MSFT) Prce Target Trimmed by $25 Despite Better-than-Expected Q1 Results With an upside p
+MSFT,unlabeled,0.75,-3.1532,0.5074,2026-05-06T19:01:33,"Is Microsoft Corp (MSFT) Stock More Enticing After FYQ3 Report? If you click 'Accept all', we and ou"
+MSFT,unlabeled,1.0,-2.6813,0.5046,2026-05-07T16:41:47,Here’s What the Street Thinks About Microsoft Corporation (MSFT) Post Earnings If you click 'Accept 
+MSFT,unlabeled,0.75,-1.4958,0.483,2026-05-08T16:56:05,A New Milestone Suggests Microsoft’s (MSFT) AI Ecosystem May Be Gaining Even More Traction If you cl
+MSFT,unlabeled,1.0,-3.3342,0.4807,2026-05-08T17:11:23,Microsoft Shares Dip 1% as Investors Weigh Cloud Growth and AI Spending Outlook NEW YORK — Microsoft
+MSFT,unlabeled,0.75,-2.513,0.4653,2026-05-07T15:08:12,MSFT Stock Alert: Microsoft Weighs Abandoning Renewable Energy Target as AI Boom Continues If you cl
+MSFT,unlabeled,0.75,-1.7384,0.4125,2026-05-08T11:15:24,"Microsoft (MSFT) Partners With CAISI, AISI to Advance AI Model Testing Standards If you click 'Accep"
+MSFT,unlabeled,0.75,-0.8833,0.4048,2026-05-07T12:11:44,"Microsoft’s (MSFT) Margins Face Temporary Headwind If you click 'Accept all', we and our partners, i"
+MSFT,unlabeled,1.0,-10.7942,0.2615,2026-05-07T10:45:12,'They don’t care if everyone quits': Texts show chaos inside OpenAI during Sam Altman ouster Newly r
+MSFT,unlabeled,1.0,-10.7942,0.2615,2026-05-07T10:45:12,'They don’t care if everyone quits': Texts show chaos inside OpenAI during Sam Altman ouster Newly r
+MSFT,unlabeled,0.0,-11.3203,0.1528,2026-05-06T16:29:00,"mcp-stockscreen added to PyPI MCP server for stock screening — technical, fundamental, options, news"
+MSFT,unlabeled,0.0,-11.1455,0.1504,2026-05-06T16:36:40,There’s Another AI-Powered IPO in the Works. Here’s What You Should Know. AI startups like Cerebras 
+MSFT,unlabeled,0.0,-11.312,0.1167,2026-05-08T13:42:00,Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUB
+MSFT,unlabeled,0.0,-11.312,0.1159,2026-05-08T13:12:00,Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUB
+MSFT,unlabeled,0.0,-11.3602,0.1129,2026-05-06T18:03:27,Anthropic to rent all AI capacity at SpaceX's Colossus data center Anthropic says it will rent all o
+MSFT,unlabeled,0.0,-11.2955,0.1023,2026-05-07T15:34:21,'Still don't want me?' — trial reveals Sam Altman's frantic texts after 2023 OpenAI ouster Sam Altma
+MSFT,unlabeled,0.0,-11.3481,0.088,2026-05-07T00:48:01,"Apple shares hit new all-time closing high In Nasdaq trading today, shares of Apple Inc. rose to hit"
+MSFT,unlabeled,0.0,-11.3364,0.0274,2026-05-08T12:24:18,"algorithm-stat added to PyPI Unified quant-finance toolkit: market data, metrics, charts, Monte Carl"
+MSFT,unlabeled,0.0,-11.4187,0.0132,2026-05-07T19:15:42,[vim-security] Heap Buffer Overflow in spell file loading affects Vim Posted by Christian Brabandt o
+NVDA,unlabeled,1.0,-1.1181,0.6263,2026-05-08T11:17:18,"NVIDIA (NVDA): 10 Best Stocks to Buy for the Next 15 Years If you click 'Accept all', we and our par"
+NVDA,unlabeled,1.0,0.4109,0.574,2026-05-08T16:58:50,NVIDIA (NVDA) Gains Another Enterprise AI Win As Adoption Continues To Expand With an upside potenti
+NVDA,unlabeled,1.0,-1.6636,0.5642,2026-05-07T22:45:38,NVIDIA Corporation (NVDA): Should Not Be Touched? We just covered Sell These 4 Stocks and Go All In 
+NVDA,unlabeled,1.0,-3.7535,0.5375,2026-05-07T16:09:07,"Get Paid 10% To Buy NVDA At A 30% Discount, Here's How At about $207.83 a share, Nvidia (NVDA) is tr"
+NVDA,unlabeled,1.0,-2.1673,0.5324,2026-05-08T13:50:48,"Is Nvidia (NVDA) The Best AI Stock Pick of Cathie Wood in 2026? If you click 'Accept all', we and ou"
+NVDA,unlabeled,1.0,-3.4608,0.4989,2026-05-07T23:56:13,Nvidia stocks: Why is NVDA share price down even as AI giant paid several billion ​dollars investmen
+NVDA,unlabeled,1.0,-2.0909,0.4491,2026-05-07T20:34:00,NVIDIA and IREN Announce Strategic Partnership to Accelerate Deployment of up to 5 Gigawatts of AI I
+NVDA,unlabeled,0.25,-5.9132,0.4439,2026-05-08T15:03:55,"AMD vs. NVDA: Which AI Chip Giant Belongs in Your 10-Year Portfolio? If you click 'Accept all', we a"
+NVDA,unlabeled,1.0,-6.8821,0.407,2026-05-08T17:02:38,"Bitcoin Miner IREN Secures $3.4 Billion Nvidia AI Deal, With $2.1 Billion Share Option Nvidia gains "
+NVDA,unlabeled,1.0,-2.0327,0.3978,2026-05-07T20:34:00,NVIDIA and IREN Announce Strategic Partnership to Accelerate Deployment of up to 5 Gigawatts of AI I
+NVDA,unlabeled,1.0,-5.9202,0.3915,2026-05-07T00:30:32,Alphabet Is $230 Billion Away From Overtaking Nvidia: Will GOOGL Dethrone NVDA By June? Alphabet pos
+NVDA,unlabeled,1.0,-3.5573,0.3297,2026-05-07T15:05:56,"Corning Stock Is Surging on a Major Nvidia Deal: ‘AI Is Not Just a Technology Story, It Is a Manufac"
+NVDA,unlabeled,0.0,-11.1964,0.1236,2026-05-08T15:39:09,Daiwa Just Upgraded Qualcomm to Outperform: $225 Price Target Bets on Data Center AI Pivot Daiwa upg
+NVDA,unlabeled,0.0,-11.2811,0.0722,2026-05-08T17:15:24,Intel stock hits fourth straight record high as Apple report fuels chip rally Intel and Apple have r
+NVDA,unlabeled,0.0,-11.3283,0.0684,2026-05-08T15:35:14,Micron’s AI memory rally is still running hot Micron's AI memory rally is still running hot. What ha
+NVDA,unlabeled,0.0,-11.2769,0.0665,2026-05-08T13:42:00,Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUB
+NVDA,unlabeled,0.0,-11.2771,0.0655,2026-05-08T13:12:00,Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUB
+NVDA,unlabeled,0.0,-11.3601,0.0321,2026-05-06T20:37:03,Stock Surge on Robust Tech Earnings and US-Iran Peace Hopes The S&P 500 Index ($SPX ) (SPY ) on Wedn
+NVDA,unlabeled,0.0,-11.3539,0.0261,2026-05-07T00:48:01,"Apple shares hit new all-time closing high In Nasdaq trading today, shares of Apple Inc. rose to hit"
+NVDA,unlabeled,0.0,-11.3304,0.0,2026-05-08T12:24:18,"algorithm-stat added to PyPI Unified quant-finance toolkit: market data, metrics, charts, Monte Carl"
+GOOGL,unlabeled,1.0,-5.5411,0.4553,2026-05-07T06:22:23,Alphabet (GOOGL): A Must-Buy Stock with the Strongest 1Q2026 Earnings Beats Alphabet Inc. (NASDAQ:GO
+GOOGL,unlabeled,0.75,-4.9126,0.4481,2026-05-07T13:11:32,"Alphabet (GOOGL): The Best Strong Buy S&P 500 Stock to Invest In If you click 'Accept all', we and o"
+GOOGL,unlabeled,1.0,-5.7366,0.4366,2026-05-06T19:00:32,"What Does Alphabet Inc (GOOGL)’s Q1 Say About Cloud Business? If you click 'Accept all', we and our "
+GOOGL,unlabeled,0.0,-11.0948,0.3464,2026-05-06T13:00:02,So Much for the Software Apocalypse: Atlassian Stock Surges as Data Center Revenue Grows 44% Atlassi
+GOOGL,unlabeled,1.0,-10.9369,0.3368,2026-05-06T13:30:02,OG&E Just Landed a Google Data Center Deal. Buy OGE Stock Here. OG&E just signed a landmark deal to 
+GOOGL,unlabeled,0.75,-7.7233,0.3364,2026-05-06T15:07:55,"Twilio Just Reported Its Fastest Growth Since 2022. AI Is Helping, Not Hurting, TWLO Stock. Twilio's"
+GOOGL,unlabeled,0.0,-11.3198,0.2772,2026-05-05T23:11:28,"Stock market today: Nasdaq, S&P 500, Dow gain on rising hopes for Iran peace, upbeat tech earnings M"
+GOOGL,unlabeled,0.0,-11.3129,0.2754,2026-05-05T23:11:28,"Stock market today: Nasdaq, S&P 500, Dow rally on rising hopes for Iran peace, upbeat tech earnings "
+GOOGL,unlabeled,1.0,-9.2546,0.2435,2026-05-07T00:30:32,Alphabet Is $230 Billion Away From Overtaking Nvidia: Will GOOGL Dethrone NVDA By June? Alphabet pos
+GOOGL,unlabeled,0.0,-11.4368,0.1983,2026-05-05T22:29:17,Jim Cramer: Here's the list of AI winners to buy for 2026 and beyond CNBC's Jim Cramer said the data
+GOOGL,unlabeled,0.0,-11.4255,0.1669,2026-05-06T13:15:01,Intel Stock Is Up 190% in 2026 and Trump Says the U.S. Has Made $30 Billion. The Early Innings for I
+GOOGL,unlabeled,0.0,-11.3146,0.1627,2026-05-06T16:36:40,There’s Another AI-Powered IPO in the Works. Here’s What You Should Know. AI startups like Cerebras 
+GOOGL,unlabeled,0.0,-11.4327,0.1513,2026-05-08T12:24:18,"algorithm-stat added to PyPI Unified quant-finance toolkit: market data, metrics, charts, Monte Carl"
+GOOGL,unlabeled,0.0,-11.4436,0.1469,2026-05-06T16:29:00,"mcp-stockscreen added to PyPI MCP server for stock screening — technical, fundamental, options, news"
+GOOGL,unlabeled,0.0,-11.4643,0.1339,2026-05-06T18:03:27,Anthropic to rent all AI capacity at SpaceX's Colossus data center Anthropic says it will rent all o
+GOOGL,unlabeled,0.0,-11.4369,0.1245,2026-05-08T13:12:00,Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUB
+GOOGL,unlabeled,0.0,-11.4373,0.1242,2026-05-08T13:42:00,Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUB
+GOOGL,unlabeled,0.0,-11.3513,0.1232,2026-05-06T12:30:00,"Service Robotics Rise Transforms How Businesses Operate AUSTIN, Texas, May 06, 2026 (GLOBE NEWSWIRE)"
+GOOGL,unlabeled,0.0,-11.2807,0.1069,2026-05-07T17:27:19,Upstart Stock Plunged on Earnings but Executives Say Investors Are Missing the Bigger Picture Upstar
+GOOGL,unlabeled,0.0,-11.4392,0.0202,2026-05-07T00:48:01,"Apple shares hit new all-time closing high In Nasdaq trading today, shares of Apple Inc. rose to hit"
+TSLA,unlabeled,0.75,-2.3859,0.6105,2026-05-03T18:13:12,"Is Tesla, Inc. (TSLA) A Good Stock To Buy Now? If you click 'Accept all', we and our partners, inclu"
+TSLA,unlabeled,1.0,-3.594,0.5476,2026-05-08T11:30:02,"218,000 Reasons to Sell Tesla Stock in May The EV giant is recalling vehicles due a rearview camera "
+TSLA,unlabeled,1.0,-2.1849,0.5455,2026-05-01T11:42:22,Tesla (TSLA) reveals $573M web of transactions between Elon Musk’s companies Tesla’s amended annual 
+TSLA,unlabeled,1.0,-3.4821,0.5377,2026-05-06T13:03:20,"Buy, Hold or Sell Tesla Stock Below $400 in May 2026? Tesla (NASDAQ:TSLA) sits below $400 after a sh"
+TSLA,unlabeled,1.0,-3.5828,0.4937,2026-05-07T16:50:40,Tesla’s 4680 battery cells are underperforming and frustrating buyers Five years after Tesla (TSLA) 
+TSLA,unlabeled,0.75,-2.9574,0.4765,2026-05-02T06:09:09,"Here’s What Jim Cramer Thinks You Should Do With Tesla (TSLA) Shares If you click 'Accept all', we a"
+TSLA,unlabeled,1.0,-6.5505,0.4055,2026-05-07T16:50:15,"Intel, Lam, KLA: Will Musk’s $120B Terafab Boost These Stocks? Earlier this week, Elon Musk official"
+TSLA,unlabeled,0.0,-10.9981,0.3222,2026-05-03T12:33:02,"Rivian Tops Q1 Estimates, but Investors Rightly Remain Wary Electric vehicle stocks have faced a bum"
+TSLA,negative,0.0,-11.3007,0.279,2026-05-06T13:15:01,Intel Stock Is Up 190% in 2026 and Trump Says the U.S. Has Made $30 Billion. The Early Innings for I
+TSLA,negative,0.0,-11.3688,0.2585,2026-05-05T15:06:43,"Why Meta Stock Is Objectively Cheap at Current Levels Meta is currently trading at a P/E of 20, a va"
+TSLA,negative,0.0,-11.2035,0.2294,2026-05-04T10:00:00,"Tech stocks today: Semiconductor company earnings in focus amid AI boom, Musk vs. Altman fight conti"
+TSLA,unlabeled,0.0,-11.3611,0.2261,2026-05-04T11:30:02,Amazon Stock Forecast: Could AI and Chips Make AMZN a $4 Trillion Company? Amazon could be the next 
+TSLA,unlabeled,0.0,-11.369,0.1753,2026-05-05T20:48:57,"Apple shares hit new all-time closing high In Nasdaq trading today, shares of Apple Inc. rose to hit"
+TSLA,unlabeled,0.0,-11.3832,0.1738,2026-05-07T00:48:01,"Apple shares hit new all-time closing high In Nasdaq trading today, shares of Apple Inc. rose to hit"
+TSLA,negative,0.0,-11.3562,0.1647,2026-05-08T13:12:00,Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUB
+TSLA,negative,0.0,-11.3563,0.1644,2026-05-08T13:42:00,Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUB
+TSLA,unlabeled,0.0,-11.3528,0.1607,2026-05-04T11:00:02,"Option Volatility And Earnings Report For May 4 - 8 We have Palantir, Advanced Micro Devices, Coinba"
+TSLA,unlabeled,0.0,-11.2101,0.1581,2026-05-06T12:30:00,"Service Robotics Rise Transforms How Businesses Operate AUSTIN, Texas, May 06, 2026 (GLOBE NEWSWIRE)"
+TSLA,unlabeled,0.0,-11.4143,0.0894,2026-05-02T01:22:39,huxley-skill-stocks added to PyPI Voice-controlled stock quotes for Huxley via Alpha Vantage. Refere
+TSLA,unlabeled,0.0,-11.4555,0.0,2026-05-01T15:16:43,"pentport added to PyPI Python SDK for the PentPort API Python SDK for the PentPort API. Install pi"

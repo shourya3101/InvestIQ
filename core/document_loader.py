@@ -288,6 +288,7 @@ class DocumentLoader:
                         ticker=doc.ticker,
                         date=doc.date,
                         filepath=doc.filepath,
+                        about_score=doc.about_score,
                     )
                 )
         return result

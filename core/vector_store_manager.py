@@ -118,6 +118,10 @@ class VectorStoreManager:
                 "filepath": doc.filepath or "",
                 "date": date_str,
             }
+            # Chroma rejects None values; only write the key when present so
+            # legacy documents remain distinguishable from score-0 documents.
+            if doc.about_score is not None:
+                metadata["about_score"] = float(doc.about_score)
             metadatas.append(metadata)
 
         self.collection.upsert(

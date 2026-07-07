@@ -19,7 +19,9 @@ import requests
 # Allow running from repo root or from scripts/ directly.
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from config import CHROMA_DIR, CHROMA_COLLECTION
+from config import CHROMA_DIR, CHROMA_COLLECTION, ABOUTNESS_THRESHOLD
+from core.company_registry import CompanyInfo, get_company
+from core.retrieval import aboutness_score
 from core.schemas import DocumentSchema
 from core.vector_store_manager import VectorStoreManager
 
@@ -58,8 +60,12 @@ def fetch_articles(
     ticker: str,
     api_key: Optional[str],
     page_size: int = 20,
+    company: Optional[CompanyInfo] = None,
 ) -> list[dict]:
     """Fetch up to *page_size* articles about *ticker* from NewsAPI.
+
+    The query names the company ("\"Tesla\" OR \"TSLA\"") instead of the bare
+    ticker so full-text matching skews toward genuinely-about articles.
 
     Returns an empty list when:
     - *api_key* is absent/empty
@@ -68,8 +74,11 @@ def fetch_articles(
     if not api_key:
         return []
 
+    if company is None:
+        company = get_company(ticker)
+
     params = {
-        "q": ticker,
+        "q": f'"{company.name}" OR "{ticker}"',
         "pageSize": page_size,
         "language": "en",
         "sortBy": "publishedAt",
@@ -94,16 +103,34 @@ def fetch_articles(
 # ── schema conversion ─────────────────────────────────────────────────────────
 
 
-def articles_to_documents(articles: list[dict], ticker: str) -> list[DocumentSchema]:
-    """Convert NewsAPI article dicts into chunked DocumentSchema objects."""
+def articles_to_documents(
+    articles: list[dict],
+    ticker: str,
+    company: Optional[CompanyInfo] = None,
+) -> list[DocumentSchema]:
+    """Convert NewsAPI articles into chunked DocumentSchema objects.
+
+    Articles scoring below ABOUTNESS_THRESHOLD at the article level (title
+    weighted double) are skipped entirely — passing mentions never enter
+    the corpus.  Every kept chunk carries the article-level about_score.
+    """
+    if company is None:
+        company = get_company(ticker)
+
     docs: list[DocumentSchema] = []
 
     for article in articles:
+        title = article.get("title", "") or ""
         raw_content = " ".join(filter(None, [
-            article.get("title", ""),
+            title,
             article.get("description", ""),
             article.get("content", ""),
         ]))
+
+        # Title counted twice: a headline mention is a strong aboutness signal.
+        about = aboutness_score(f"{title} {raw_content}", company)
+        if about < ABOUTNESS_THRESHOLD:
+            continue
 
         published_at = article.get("publishedAt")
         date: Optional[datetime] = None
@@ -125,6 +152,7 @@ def articles_to_documents(articles: list[dict], ticker: str) -> list[DocumentSch
                     ticker=ticker,
                     date=date,
                     filepath=filepath,
+                    about_score=round(about, 4),
                 )
             )
 
@@ -144,11 +172,12 @@ def ingest_news(
     if not api_key:
         return 0
 
-    articles = fetch_articles(ticker, api_key, page_size=page_size)
+    company = get_company(ticker)
+    articles = fetch_articles(ticker, api_key, page_size=page_size, company=company)
     if not articles:
         return 0
 
-    docs = articles_to_documents(articles, ticker)
+    docs = articles_to_documents(articles, ticker, company=company)
     if not docs:
         return 0
 

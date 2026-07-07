@@ -36,15 +36,18 @@ gather(Research + Trend) → Sentiment → Risk → gather(Analyst + Debate) →
 - [x] Fix 6: Better document chunking (sliding window 800 chars, 100 overlap, 29 tests)
 - [x] Fix 7: Progressive frontend loading — NDJSON streaming, per-agent progress bar (195 tests)
 - [x] Fix 8: Production readiness — structured logging, yfinance cache, slowapi rate limit, ticker validation, dev/prod config (234 tests)
+- [x] Fix 9: Trustworthy retrieval — aboutness gate, cross-encoder re-rank, evidence_status propagation, no_view memos, degraded frontend (316 tests; spec: docs/superpowers/specs/2026-07-03-trustworthy-retrieval-design.md)
 
 ## Known Issues
-- Thesis still cuts off mid-sentence (Fix 4 target)
 - BAC ticker had duplicate ID error on ingestion
-- VectorStoreManager now singleton (fixed in Fix 3)
+- TSLA off-topic retrieval (RQ1 eval: Meta/Intel/Bybit items) is now gated — Fix 9
+  rejects them at query time (see evaluation/results/calibration_scores.csv)
 
 ## Key Files
 - agents/coordinator_agent.py ← async pipeline orchestrator
-- agents/analyst_agent.py ← memo generation, thesis cutoff lives here
+- agents/analyst_agent.py ← memo generation, no_view/partial degradation
+- core/retrieval.py ← retrieval policy: aboutness gate, re-rank, evidence_status
+- core/company_registry.py ← ticker → company name/aliases (config→cache→yfinance)
 - core/vector_store_manager.py ← ChromaDB wrapper
 - core/singletons.py ← shared VectorStoreManager singleton
 - core/utils.py ← shared parse_llm_json utility

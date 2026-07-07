@@ -76,8 +76,8 @@ def _mc(ticker="T"):
 def _fakes(with_debate=True):
     async def fake_research(t, q, db, tk): return _r(t)
     async def fake_trend(t, m, fp): return _t(t)
-    async def fake_sentiment(t, q, wd, tk): return _s(t)
-    async def fake_risk(t, m, fp, q, wd): return _rk(t)
+    async def fake_sentiment(t, q, wd, tk, research): return _s(t)
+    async def fake_risk(t, m, fp, q, wd, trend, sentiment): return _rk(t)
     async def fake_analyst(t, res, tr, se, ri, q): return _m(t)
     async def fake_debate(t, res, tr, se, ri): return _db(t)
     async def fake_compare(memo): return _mc(memo.ticker)

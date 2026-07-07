@@ -97,11 +97,17 @@ async def _run_pipeline(
     async def _default_trend(t, m, fp):
         return await asyncio.to_thread(run_trend, t, mode=m, filepath=fp)
 
-    async def _default_sentiment(t, q, wd, tk):
-        return await asyncio.to_thread(run_sentiment, t, question=q, window_days=wd, top_k=tk, store=store)
+    async def _default_sentiment(t, q, wd, tk, research):
+        return await asyncio.to_thread(
+            run_sentiment, t, question=q, window_days=wd, top_k=tk,
+            store=store, research=research,
+        )
 
-    async def _default_risk(t, m, fp, q, wd):
-        return await asyncio.to_thread(run_risk, t, mode=m, price_filepath=fp, question=q, window_days=wd, store=store)
+    async def _default_risk(t, m, fp, q, wd, trend, sentiment):
+        return await asyncio.to_thread(
+            run_risk, t, mode=m, price_filepath=fp, question=q, window_days=wd,
+            store=store, trend=trend, sentiment=sentiment,
+        )
 
     async def _default_analyst(t, res, tr, se, ri, q):
         return await asyncio.to_thread(run_analyst_memo, ticker=t, research=res, trend=tr, sentiment=se, risk=ri, question=q)
@@ -170,7 +176,7 @@ async def _run_pipeline(
 
     t = time.time()
     sentiment, s_t, s_err = await _guarded(
-        sf(ticker, question, days_back, 5), _fallback_sentiment
+        sf(ticker, question, days_back, 5, research), _fallback_sentiment
     )
 
     if s_err:
@@ -193,7 +199,8 @@ async def _run_pipeline(
     )
 
     risk, rk_t, rk_err = await _guarded(
-        rkf(ticker, mode, price_filepath, question, days_back), _fallback_risk
+        rkf(ticker, mode, price_filepath, question, days_back, trend, sentiment),
+        _fallback_risk,
     )
 
     if rk_err:
@@ -209,8 +216,9 @@ async def _run_pipeline(
 
     # ── Stage 4: Analyst + Debate in parallel ────────────────────────────────
     analyst_coro = af(ticker, research, trend, sentiment, risk, question)
+    skip_debate = run_debate_flag and research.evidence_status == "insufficient"
 
-    if run_debate_flag:
+    if run_debate_flag and not skip_debate:
         debate_coro = df(ticker, research, trend, sentiment, risk)
 
         (memo, an_t, an_err), (debate, db_t, db_err) = await asyncio.gather(
@@ -224,7 +232,11 @@ async def _run_pipeline(
     if an_err or memo is None:
         raise RuntimeError(f"Analyst agent failed critically: {an_err}")
 
-    if run_debate_flag:
+    if skip_debate:
+        memo.debate_skipped_reason = "insufficient evidence"
+        pipeline_trace.append(_trace("debate", "SKIPPED: insufficient evidence", 0.0))
+
+    if run_debate_flag and not skip_debate:
         if db_err:
             pipeline_trace.append(_trace("debate", f"FAILED: {db_err}", db_t))
         else:
@@ -346,11 +358,17 @@ async def stream_pipeline_events(
     async def _default_trend(t, m, fp):
         return await asyncio.to_thread(run_trend, t, mode=m, filepath=fp)
 
-    async def _default_sentiment(t, q, wd, tk):
-        return await asyncio.to_thread(run_sentiment, t, question=q, window_days=wd, top_k=tk, store=store)
+    async def _default_sentiment(t, q, wd, tk, research):
+        return await asyncio.to_thread(
+            run_sentiment, t, question=q, window_days=wd, top_k=tk,
+            store=store, research=research,
+        )
 
-    async def _default_risk(t, m, fp, q, wd):
-        return await asyncio.to_thread(run_risk, t, mode=m, price_filepath=fp, question=q, window_days=wd, store=store)
+    async def _default_risk(t, m, fp, q, wd, trend, sentiment):
+        return await asyncio.to_thread(
+            run_risk, t, mode=m, price_filepath=fp, question=q, window_days=wd,
+            store=store, trend=trend, sentiment=sentiment,
+        )
 
     async def _default_analyst(t, res, tr, se, ri, q):
         return await asyncio.to_thread(run_analyst_memo, ticker=t, research=res, trend=tr, sentiment=se, risk=ri, question=q)
@@ -410,7 +428,9 @@ async def stream_pipeline_events(
 
     # ── Stage 2: Sentiment ────────────────────────────────────────────────────
     yield {"event": "running", "agent": "sentiment"}
-    sentiment, s_t, s_err = await _guarded(sf(ticker, question, days_back, 5), _fb_sentiment)
+    sentiment, s_t, s_err = await _guarded(
+        sf(ticker, question, days_back, 5, research), _fb_sentiment
+    )
 
     if s_err:
         pipeline_trace.append(_trace("sentiment", f"FAILED: {s_err}", s_t))
@@ -421,7 +441,10 @@ async def stream_pipeline_events(
 
     # ── Stage 3: Risk ─────────────────────────────────────────────────────────
     yield {"event": "running", "agent": "risk"}
-    risk, rk_t, rk_err = await _guarded(rkf(ticker, mode, price_filepath, question, days_back), _fb_risk)
+    risk, rk_t, rk_err = await _guarded(
+        rkf(ticker, mode, price_filepath, question, days_back, trend, sentiment),
+        _fb_risk,
+    )
 
     if rk_err:
         pipeline_trace.append(_trace("risk", f"FAILED: {rk_err}", rk_t))
@@ -432,12 +455,15 @@ async def stream_pipeline_events(
 
     # ── Stage 4: Analyst + Debate ─────────────────────────────────────────────
     yield {"event": "running", "agent": "analyst"}
-    if run_debate_flag:
+    skip_debate = run_debate_flag and research.evidence_status == "insufficient"
+    if run_debate_flag and not skip_debate:
         yield {"event": "running", "agent": "debate"}
+    elif skip_debate:
+        yield {"event": "skipped", "agent": "debate", "message": "insufficient evidence"}
 
     analyst_coro = af(ticker, research, trend, sentiment, risk, question)
 
-    if run_debate_flag:
+    if run_debate_flag and not skip_debate:
         (memo, an_t, an_err), (debate, db_t, db_err) = await asyncio.gather(
             _guarded(analyst_coro, None),
             _guarded(df(ticker, research, trend, sentiment, risk), None),
@@ -458,10 +484,13 @@ async def stream_pipeline_events(
             writer_mode="deterministic",
         )
     else:
+        if skip_debate:
+            memo.debate_skipped_reason = "insufficient evidence"
+            pipeline_trace.append(_trace("debate", "SKIPPED: insufficient evidence", 0.0))
         pipeline_trace.append(_trace("analyst", f"action={memo.action.signal}", an_t))
         yield {"event": "done", "agent": "analyst", "data": memo.model_dump(mode="json")}
 
-    if run_debate_flag:
+    if run_debate_flag and not skip_debate:
         if db_err:
             pipeline_trace.append(_trace("debate", f"FAILED: {db_err}", db_t))
             yield {"event": "error", "agent": "debate", "message": str(db_err)}

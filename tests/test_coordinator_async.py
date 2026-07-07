@@ -131,12 +131,12 @@ def _minimal_fakes(call_log=None, *, include_debate=True):
         log.append("trend_end")
         return _trend(ticker)
 
-    async def fake_sentiment(ticker, question, window_days, top_k):
+    async def fake_sentiment(ticker, question, window_days, top_k, research):
         log.append("sentiment_start")
         log.append("sentiment_end")
         return _sentiment(ticker)
 
-    async def fake_risk(ticker, mode, price_filepath, question, window_days):
+    async def fake_risk(ticker, mode, price_filepath, question, window_days, trend, sentiment):
         log.append("risk_start")
         log.append("risk_end")
         return _risk(ticker)
@@ -228,7 +228,7 @@ def test_sentiment_starts_only_after_research_completes():
         call_log.append("research_end")
         return _research(ticker)
 
-    async def fake_sentiment(ticker, question, window_days, top_k):
+    async def fake_sentiment(ticker, question, window_days, top_k, research):
         call_log.append("sentiment_start")
         return _sentiment(ticker)
 
@@ -251,12 +251,12 @@ def test_risk_starts_only_after_both_trend_and_sentiment_complete():
         call_log.append("trend_end")
         return _trend(ticker)
 
-    async def fake_sentiment(ticker, question, window_days, top_k):
+    async def fake_sentiment(ticker, question, window_days, top_k, research):
         await asyncio.sleep(0)
         call_log.append("sentiment_end")
         return _sentiment(ticker)
 
-    async def fake_risk(ticker, mode, price_filepath, question, window_days):
+    async def fake_risk(ticker, mode, price_filepath, question, window_days, trend, sentiment):
         call_log.append("risk_start")
         return _risk(ticker)
 
@@ -279,7 +279,7 @@ def test_risk_starts_only_after_both_trend_and_sentiment_complete():
 def test_analyst_starts_only_after_risk_completes():
     call_log = []
 
-    async def fake_risk(ticker, mode, price_filepath, question, window_days):
+    async def fake_risk(ticker, mode, price_filepath, question, window_days, trend, sentiment):
         await asyncio.sleep(0)
         call_log.append("risk_end")
         return _risk(ticker)
@@ -302,7 +302,7 @@ def test_analyst_starts_only_after_risk_completes():
 def test_debate_starts_only_after_risk_completes():
     call_log = []
 
-    async def fake_risk(ticker, mode, price_filepath, question, window_days):
+    async def fake_risk(ticker, mode, price_filepath, question, window_days, trend, sentiment):
         await asyncio.sleep(0)
         call_log.append("risk_end")
         return _risk(ticker)

@@ -208,8 +208,8 @@ def test_coordinator_pipeline_calls_get_store_exactly_once():
 
     async def fake_research(ticker, question, days_back, top_k): return _r(ticker)
     async def fake_trend(ticker, mode, filepath): return _t(ticker)
-    async def fake_sentiment(ticker, question, window_days, top_k): return _s(ticker)
-    async def fake_risk(ticker, mode, price_filepath, question, window_days): return _rk(ticker)
+    async def fake_sentiment(ticker, question, window_days, top_k, research): return _s(ticker)
+    async def fake_risk(ticker, mode, price_filepath, question, window_days, trend, sentiment): return _rk(ticker)
     async def fake_analyst(ticker, research, trend, sentiment, risk, question): return _m(ticker)
     async def fake_compare(memo): return _mc(memo.ticker)
     async def fake_save(memo): pass

@@ -1,0 +1,63 @@
+{
+  "ticker": "TSLA",
+  "evidence": [
+    {
+      "id": "E1",
+      "snippet": "Why Meta Stock Is Objectively Cheap at Current Levels Meta is currently trading at a P/E of 20, a valuation typical of mature industrial firms rather than tech leaders. While the market focuses on massive capex,... The last several days on the markets have been highly eventful, a",
+      "date": "2026-05-05T15:06:43"
+    },
+    {
+      "id": "E2",
+      "snippet": "Intel Stock Is Up 190% in 2026 and Trump Says the U.S. Has Made $30 Billion. The Early Innings for INTC May Be Over. Intel stock has surged in 2026. Here's what Intel's Q1 results reveal about what comes next. Few stocks have had a year like Intel (INTC). Shares of the chipmaker ",
+      "date": "2026-05-06T13:15:01"
+    },
+    {
+      "id": "E3",
+      "snippet": "Tech stocks today: Semiconductor company earnings in focus amid AI boom, Musk vs. Altman fight continues Tech stocks are in focus amid an earnings bonanza, layoffs, and AI spending plans. Meta (META) is acquiring AI robot company Assured Robot Intelligence, as the company looks t",
+      "date": "2026-05-04T10:00:00"
+    },
+    {
+      "id": "E4",
+      "snippet": "Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUBAI, UAE, May 8, 2026 /PRNewswire/ -- Bybit, the world's second-largest cryptocurrency exchange by trading volume, has expanded perpetual contracts offerings to include seven new Tr",
+      "date": "2026-05-08T13:42:00"
+    },
+    {
+      "id": "E5",
+      "snippet": "Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUBAI, UAE, May 8, 2026 /PRNewswire/ -- Bybit, the world's second-largest cryptocurrency exchange by trading volume, has expanded perpetual contracts offerings to include seven new Tr",
+      "date": "2026-05-08T13:12:00"
+    }
+  ],
+  "investiq_structured_citations": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
+  "investiq": {
+    "thesis": "Tesla presents a compelling investment opportunity despite recent bearish trends and high volatility, as evidenced by a 30-day return of -14.7% and an annualized volatility of 45.1%. The positive sentiment score of 0.60 indicates that market perception remains optimistic about Tesla's long-term growth potential, particularly in the electric vehicle and renewable energy sectors. While the stock has experienced a maximum drawdown of -15.4% over the past month, this could create an attractive entry point for long-term investors looking to capitalize on Tesla's innovative edge and market leadership. The company's commitment to expanding production capacity and advancing technology positions it well to benefit from the ongoing transition to sustainable energy. Although the associated risks are high, with a risk score of 95/100, the potential for significant returns in a rapidly evolving market justifies a bullish stance on Tesla. As the company continues to innovate and capture market share, it is likely to rebound from current pressures, making it a strong candidate for investment.",
+    "inline_prose_citations": [],
+    "inline_prose_citation_count": 0,
+    "citation_coverage": 1.0,
+    "total_claims": 6,
+    "unsupported_claims": 4,
+    "contradicted_claims": 0,
+    "cited_claims": 0,
+    "cite_faithful": 0,
+    "cite_unfaithful": 0
+  },
+  "baseline": {
+    "thesis": "**Investment Thesis for Tesla, Inc. (TSLA)**\n\nTesla, Inc. (TSLA) presents a compelling investment opportunity as it continues to lead the electric vehicle (EV) market while expanding its footprint in energy solutions and autonomous driving technology. The company's innovative approach and strong brand loyalty position it favorably against traditional automakers and emerging competitors. With the global shift towards sustainable energy and increasing regulatory support for EV adoption, Tesla is well-positioned to capture significant market share. Furthermore, the recent surge in tech stocks, particularly in the semiconductor sector, highlights the growing importance of advanced technology in automotive applications, which Tesla is uniquely equipped to leverage (E3). As the company continues to invest in AI and battery technology, it is likely to enhance its competitive edge and drive long-term growth. Given its current valuation and growth potential, TSLA remains an attractive buy for investors looking to capitalize on the future of transportation and energy.",
+    "inline_prose_citations": [
+      "E3"
+    ],
+    "inline_prose_citation_count": 1,
+    "citation_coverage": 0.2,
+    "total_claims": 6,
+    "unsupported_claims": 6,
+    "contradicted_claims": 0,
+    "cited_claims": 1,
+    "cite_faithful": 0,
+    "cite_unfaithful": 1
+  }
+}

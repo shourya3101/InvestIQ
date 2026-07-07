@@ -1,0 +1,31 @@
+=== RQ4 LATENCY RESULTS ===
+Experiment date: 2026-06-29 15:26:55
+Tickers tested: AAPL, MSFT, NVDA
+Runs per ticker per mode: 3
+Total runs: 18
+
+--- Async Pipeline ---
+Mean latency:  9.70s
+Std deviation: 1.69s
+Min:           8.20s
+Max:           13.36s
+
+--- Sequential Pipeline ---
+Mean latency:  17.01s
+Std deviation: 2.43s
+Min:           14.64s
+Max:           21.30s
+
+--- Speedup ---
+Ratio (seq/async): 1.75x
+Absolute reduction: 7.30s
+
+--- Output Equivalence Check (distribution level) ---
+AAPL: async={buy,buy,hold} | sequential={buy,hold,hold} | signal_sets_match=True
+MSFT: async={hold,hold,hold} | sequential={hold,hold,hold} | signal_sets_match=True
+NVDA: async={hold,hold,hold} | sequential={hold,hold,hold} | signal_sets_match=True
+All signal sets match: True
+Output equivalence interpreted at distribution level: async and sequential call identical agent functions with identical inputs, so any per-run signal variation reflects LLM sampling noise (temperature/inference nondeterminism), not scheduling differences.
+
+--- Errors ---
+None

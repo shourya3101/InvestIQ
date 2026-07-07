@@ -1,0 +1,28 @@
+=== RQ1 GROUNDING RESULTS ===
+Tickers: 5 | Total claims annotated: 59
+                         InvestIQ    Baseline
+Unsupported-claim rate:  0.533       0.552
+Mean unsupported/thesis: 3.2         3.2
+Contradicted claims:     0           0
+Inter-annotator kappa:   single annotator — not computed
+
+Per-ticker unsupported-claim rate ((unsupported + contradicted) / total):
+Ticker    InvestIQ              Baseline
+AAPL      4/6 (0.667)           3/5 (0.600)
+MSFT      3/6 (0.500)           3/6 (0.500)
+NVDA      3/6 (0.500)           2/6 (0.333)
+GOOGL     2/6 (0.333)           2/6 (0.333)
+TSLA      4/6 (0.667)           6/6 (1.000)
+
+=== RQ2 AUDITABILITY RESULTS ===
+                          InvestIQ    Baseline
+Structural cite coverage: 1.000       0.520
+Citation faithfulness:    n/a         0.857
+Cited claims (n):         0           14
+Unfaithful citations (n): 0           2
+
+--- Note on TSLA ---
+For TSLA, none of the 5 retrieved evidence items (E1-E5) are about Tesla — they cover Meta, Intel, general semiconductor earnings, and Bybit crypto news. This retrieval-corpus mismatch (not pipeline structure) drove TSLA's high unsupported-claim rate for BOTH systems (InvestIQ 4/6, Baseline 6/6) and the single unfaithful baseline citation. It should be reported as a retrieval-corpus limitation, not a pipeline-structure failure.
+
+--- Interpretation ---
+Raw unsupported-claim rates are similar between the two systems (InvestIQ 0.533 vs Baseline 0.552 over 59 annotated claims), so the multi-agent structure does not by itself reduce ungrounded claims. Where they diverge is auditability: InvestIQ's structural citation field always exposes the full retrieved evidence set (coverage 1.000), honestly surfacing the evidence actually used even when it is weak — as in TSLA, where coverage stays 1.000 over off-topic evidence — whereas the baseline only exposes the inline citations it chose to embed (coverage 0.520). When the baseline does cite it is mostly faithful (12/14 = 0.857), but the 2 unfaithful cases are silent overreach — a real E-id attached to a claim the cited evidence does not support.

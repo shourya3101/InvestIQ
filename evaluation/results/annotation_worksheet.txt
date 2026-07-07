@@ -1,0 +1,167 @@
+================================================================================
+RQ1 / RQ2 GROUNDING ANNOTATION WORKSHEET
+================================================================================
+Per sentence, fill the mark slot(s) at the start of the line:
+  Slot 1  [ ] S/U/C           -> S=Supported, U=Unsupported, C=Contradicted
+  Slot 2  [ ] cite-faithful?  -> Y/N/NA  (appears only on sentences that carry an
+                                 inline E-id; does the cited evidence support the claim?)
+Two systems over the SAME evidence pack (shown per ticker block):
+  InvestIQ cites STRUCTURALLY (memo.citations field, listed per block);
+  Baseline cites INLINE in prose (E-ids embedded in sentences).
+================================================================================
+================================================================================
+TICKER: AAPL
+================================================================================
+
+--- InvestIQ Pipeline Thesis ---
+(structured citations [memo.citations]: E1, E2, E3, E4, E5 | coverage 1.00)
+(inline-prose citations: (none) | count 0)
+[ ] S/U/C   Apple Inc. presents a compelling investment opportunity despite recent bearish trends and moderate risk indicators.
+[ ] S/U/C   The company's strong brand loyalty and innovative product pipeline continue to position it favorably in the competitive smartphone market, as evidenced by its leading sales performance reported by CounterPoint.
+[ ] S/U/C   While the stock has experienced a 30-day return of -5.0% and a maximum drawdown of -12.7%, the positive sentiment score of 0.80 suggests that investor confidence remains intact.
+[ ] S/U/C   Furthermore, ongoing discussions with Intel regarding potential collaborations could enhance Apple's technological edge and operational efficiency.
+[ ] S/U/C   The current volatility of 29.0% reflects market uncertainty, but it also presents a buying opportunity for long-term investors.
+[ ] S/U/C   Overall, Apple’s robust fundamentals and strategic initiatives indicate that it is well-positioned for future growth, making it a worthwhile addition to an equity portfolio.
+
+--- Baseline (Monolithic) Thesis ---
+(inline-prose citations: E1, E5, E4 | coverage 0.60 | count 3)
+[ ] S/U/C   [ ] cite-faithful? Y/N/NA   Apple Inc. continues to solidify its dominance in the smartphone market, as evidenced by the recent CounterPoint report highlighting the iPhone 17's exceptional sales performance, which has left competitors like Samsung trailing significantly (E1).
+[ ] S/U/C   [ ] cite-faithful? Y/N/NA   This strong market position is further supported by the company's strategic partnerships, such as potential collaborations with Intel, which could enhance its chip supply chain and innovation capabilities (E5).
+[ ] S/U/C   [ ] cite-faithful? Y/N/NA   Additionally, the ongoing demand for Apple products is bolstered by the increasing integration of advanced technologies, including AI, as seen in the rising fortunes of suppliers like Corning, which benefits from Apple's hardware needs (E4).
+[ ] S/U/C   With a robust ecosystem of services and products, coupled with a loyal customer base, Apple is well-positioned for sustained growth.
+[ ] S/U/C   Given these factors, we believe AAPL represents a compelling investment opportunity, with potential for significant upside as it continues to innovate and capture market share.
+
+--- Evidence (for reference) ---
+E1 | 2026-05-05T15:48:59 | Apple Hammers The Competition The gold standard of smartphone industry research is CounterPoint. It recently released its report on global first-quarter sales. One point is that the top... Quick Read
+<ul><li>iPhone 17 Dominates
+</li><li>Samsung Runs Far Behind
+</li><li>Lack Of
+E2 | 2026-05-08T13:42:00 | Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUBAI, UAE, May 8, 2026 /PRNewswire/ -- Bybit, the world's second-largest cryptocurrency exchange by trading volume, has expanded perpetual contracts offerings to include seven new Tr
+E3 | 2026-05-08T13:12:00 | Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUBAI, UAE, May 8, 2026 /PRNewswire/ -- Bybit, the world's second-largest cryptocurrency exchange by trading volume, has expanded perpetual contracts offerings to include seven new Tr
+E4 | 2026-05-07T15:05:56 | Corning Stock Is Surging on a Major Nvidia Deal: ‘AI Is Not Just a Technology Story, It Is a Manufacturing Story’ Shares of the glassmaking company were up a substantial 12% on the news. Corning (GLW), best known for making the glass on iPhone screens, saw its shares rally by 12%
+E5 | 2026-05-05T16:07:00 | Intel's Stock Surges to Fresh High on Deal Talks. Could Apple Be Its Next Customer? Intel shares soared to a fresh high Tuesday following a report that Apple held early talks with the chipmaker. With Tuesday's gains, Intel shares have nearly tripled in value since the start of th
+
+
+================================================================================
+TICKER: MSFT
+================================================================================
+
+--- InvestIQ Pipeline Thesis ---
+(structured citations [memo.citations]: E1, E2, E3, E4, E5 | coverage 1.00)
+(inline-prose citations: (none) | count 0)
+[ ] S/U/C   Microsoft (MSFT) presents a compelling investment opportunity despite recent bearish trends and heightened volatility.
+[ ] S/U/C   The stock has experienced a 30-day return of -7.8%, reflecting broader market concerns, yet the positive sentiment score of 0.59 indicates that investor confidence remains resilient, particularly in light of the ongoing AI boom.
+[ ] S/U/C   As the company continues to innovate and expand its AI ecosystem, it is well-positioned to capitalize on the growing demand for AI-related technologies, which could drive significant revenue growth in the coming years.
+[ ] S/U/C   While the risk profile is elevated, with a maximum drawdown of -23.4% and annualized volatility at 40.6%, the potential upside from Microsoft's strategic initiatives in AI and cloud services outweighs these risks.
+[ ] S/U/C   The current market conditions may present a buying opportunity for long-term investors willing to navigate short-term fluctuations.
+[ ] S/U/C   Overall, Microsoft's strong fundamentals and strategic positioning in the AI landscape make it an attractive investment despite recent challenges.
+
+--- Baseline (Monolithic) Thesis ---
+(inline-prose citations: E1, E2, E5 | coverage 0.60 | count 3)
+[ ] S/U/C   Investment Thesis: Microsoft Corporation (MSFT) is poised for significant growth driven by its strategic pivot towards artificial intelligence (AI) and cloud computing, which are becoming increasingly integral to its business model.
+[ ] S/U/C   [ ] cite-faithful? Y/N/NA   The company's recent considerations to abandon its renewable energy targets in favor of focusing on AI development (E1) highlight its commitment to capitalizing on the booming AI market.
+[ ] S/U/C   [ ] cite-faithful? Y/N/NA   Furthermore, the surge in AI-related IPOs, such as those from startups like Cerebras Systems, indicates a robust investor appetite for AI technologies, which could enhance Microsoft's competitive positioning in this space (E2).
+[ ] S/U/C   [ ] cite-faithful? Y/N/NA   Additionally, recent milestones in Microsoft's AI ecosystem suggest that it is gaining traction and could further solidify its market leadership (E5).
+[ ] S/U/C   As the demand for AI solutions continues to rise, Microsoft’s investments in this area are likely to yield substantial returns, making it a compelling buy for investors looking to capitalize on the future of technology.
+[ ] S/U/C   Overall, MSFT's strategic focus on AI, combined with its established cloud infrastructure, positions it well for sustained growth and profitability.
+
+--- Evidence (for reference) ---
+E1 | 2026-05-07T15:08:12 | MSFT Stock Alert: Microsoft Weighs Abandoning Renewable Energy Target as AI Boom Continues If you click 'Accept all', we and our partners, including 249 who are part of the IAB Transparency &amp; Consent Framework, will also store and / or access information on a device (in other
+E2 | 2026-05-06T16:36:40 | There’s Another AI-Powered IPO in the Works. Here’s What You Should Know. AI startups like Cerebras Systems are rushing public market markets amid investor mania for related plays from power and infrastructure to chipmakers and... Planned IPOs could offer investors more ways to g
+E3 | 2026-05-08T13:42:00 | Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUBAI, UAE, May 8, 2026 /PRNewswire/ -- Bybit, the world's second-largest cryptocurrency exchange by trading volume, has expanded perpetual contracts offerings to include seven new Tr
+E4 | 2026-05-08T13:12:00 | Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUBAI, UAE, May 8, 2026 /PRNewswire/ -- Bybit, the world's second-largest cryptocurrency exchange by trading volume, has expanded perpetual contracts offerings to include seven new Tr
+E5 | 2026-05-08T16:56:05 | A New Milestone Suggests Microsoft’s (MSFT) AI Ecosystem May Be Gaining Even More Traction If you click 'Accept all', we and our partners, including 249 who are part of the IAB Transparency &amp; Consent Framework, will also store and / or access information on a device (in other
+
+
+================================================================================
+TICKER: NVDA
+================================================================================
+
+--- InvestIQ Pipeline Thesis ---
+(structured citations [memo.citations]: E1, E2, E3, E4, E5 | coverage 1.00)
+(inline-prose citations: (none) | count 0)
+[ ] S/U/C   NVIDIA (NVDA) presents a compelling investment opportunity despite recent bearish trends, as the company continues to solidify its position as a leader in the rapidly expanding enterprise AI market.
+[ ] S/U/C   With a positive sentiment score of 0.60 and an impressive upside potential of 35.94%, NVDA is poised for recovery as adoption of its technologies accelerates.
+[ ] S/U/C   While the stock has experienced a 30-day return of -14.6% and carries a high risk profile, the underlying fundamentals and market demand for AI solutions suggest that these short-term fluctuations may be temporary.
+[ ] S/U/C   The company's ability to innovate and capture market share in AI applications positions it well for long-term growth.
+[ ] S/U/C   Investors should consider the current volatility as an opportunity to enter at a lower price point, with the potential for significant returns as market conditions stabilize.
+[ ] S/U/C   Overall, NVDA remains a strong buy for those willing to navigate the associated risks.
+
+--- Baseline (Monolithic) Thesis ---
+(inline-prose citations: E1, E4, E5 | coverage 0.60 | count 3)
+[ ] S/U/C   [ ] cite-faithful? Y/N/NA   NVIDIA Corporation (NASDAQ: NVDA) stands at the forefront of the AI revolution, making it a compelling investment opportunity with an upside potential of 35.94% (E1).
+[ ] S/U/C   The company's robust portfolio of products and services, particularly in enterprise AI, positions it as a leader in a rapidly expanding market.
+[ ] S/U/C   [ ] cite-faithful? Y/N/NA   As evidenced by its recent enterprise AI wins, NVIDIA continues to gain traction among businesses looking to leverage AI for operational efficiency and innovation (E1).
+[ ] S/U/C   [ ] cite-faithful? Y/N/NA   Furthermore, the growing interest from influential investors, such as Cathie Wood, underscores the stock's potential as a top pick in the AI sector (E4).
+[ ] S/U/C   [ ] cite-faithful? Y/N/NA   With its strong fundamentals and strategic positioning, NVIDIA is not only a key player in the tech industry but also one of the best stocks to buy for long-term growth (E5).
+[ ] S/U/C   Given these factors, we believe that NVDA is well-positioned to deliver substantial returns over the next several years, making it a must-have in any growth-oriented portfolio.
+
+--- Evidence (for reference) ---
+E1 | 2026-05-08T16:58:50 | NVIDIA (NVDA) Gains Another Enterprise AI Win As Adoption Continues To Expand With an upside potential of 35.94%, NVIDIA Corporation (NASDAQ:NVDA) is among the 10 Tech Stocks That Could Make You a Millionaire. On April 27, LiveRamp... With an upside potential of 35.94%, NVIDIA Co
+E2 | 2026-05-08T13:42:00 | Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUBAI, UAE, May 8, 2026 /PRNewswire/ -- Bybit, the world's second-largest cryptocurrency exchange by trading volume, has expanded perpetual contracts offerings to include seven new Tr
+E3 | 2026-05-08T13:12:00 | Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUBAI, UAE, May 8, 2026 /PRNewswire/ -- Bybit, the world's second-largest cryptocurrency exchange by trading volume, has expanded perpetual contracts offerings to include seven new Tr
+E4 | 2026-05-08T13:50:48 | Is Nvidia (NVDA) The Best AI Stock Pick of Cathie Wood in 2026? If you click 'Accept all', we and our partners, including 249 who are part of the IAB Transparency &amp; Consent Framework, will also store and / or access information on a device (in other words, us… [+1046 chars]
+E5 | 2026-05-08T11:17:18 | NVIDIA (NVDA): 10 Best Stocks to Buy for the Next 15 Years If you click 'Accept all', we and our partners, including 249 who are part of the IAB Transparency &amp; Consent Framework, will also store and / or access information on a device (in other words, us… [+1046 chars]
+
+
+================================================================================
+TICKER: GOOGL
+================================================================================
+
+--- InvestIQ Pipeline Thesis ---
+(structured citations [memo.citations]: E1, E2, E3, E4, E5 | coverage 1.00)
+(inline-prose citations: (none) | count 0)
+[ ] S/U/C   Despite a recent 30-day return decline of 16.2% and a bearish trend accompanied by high volatility of 28.2%, GOOGL presents an attractive investment opportunity due to its strong underlying fundamentals and positive market sentiment.
+[ ] S/U/C   The tech sector is witnessing a resurgence, driven by impressive AI-fueled earnings and a growing demand for cloud services, as evidenced by the recent performance of companies like Atlassian.
+[ ] S/U/C   GOOGL's robust position in the AI and cloud markets positions it well to capitalize on these trends, potentially offsetting current market headwinds.
+[ ] S/U/C   While the stock carries a high-risk profile, reflected in its risk score of 78/100 and a maximum drawdown of 15.8% over the past month, the positive sentiment score of 0.59 suggests that investor confidence remains intact.
+[ ] S/U/C   As the broader market rallies on hopes for geopolitical stability and tech advancements, GOOGL is likely to benefit from renewed investor interest.
+[ ] S/U/C   Therefore, despite short-term volatility, the long-term growth prospects driven by innovation and market leadership make GOOGL a compelling buy at current levels.
+
+--- Baseline (Monolithic) Thesis ---
+(inline-prose citations: E3, E1, E5 | coverage 0.60 | count 3)
+[ ] S/U/C   Alphabet Inc. (GOOGL) is well-positioned to capitalize on the ongoing AI revolution and the robust demand for cloud services, making it a compelling investment opportunity.
+[ ] S/U/C   [ ] cite-faithful? Y/N/NA   The recent surge in tech earnings, particularly in AI-driven sectors, indicates a strong market sentiment that favors companies with advanced technological capabilities (E3).
+[ ] S/U/C   [ ] cite-faithful? Y/N/NA   As seen with Atlassian's impressive 44% growth in data center revenue, the fears surrounding a software apocalypse are being alleviated, suggesting that demand for cloud services remains resilient (E1).
+[ ] S/U/C   [ ] cite-faithful? Y/N/NA   Furthermore, the overall tech sector is experiencing a rally, driven by optimism surrounding AI advancements, which bodes well for GOOGL's core business segments (E5).
+[ ] S/U/C   With its extensive investments in AI and cloud infrastructure, Alphabet is not only a leader in search and advertising but is also poised to benefit from the increasing integration of AI across various industries.
+[ ] S/U/C   Given these factors, GOOGL presents a strong growth narrative that aligns with current market trends, making it an attractive addition to any investment portfolio.
+
+--- Evidence (for reference) ---
+E1 | 2026-05-06T13:00:02 | So Much for the Software Apocalypse: Atlassian Stock Surges as Data Center Revenue Grows 44% Atlassian is crushing software fears as cloud demand holds firm and data-center growth climbs, forcing Wall Street to rethink the AI threat. For months, investors have worried that AI cou
+E2 | 2026-05-06T13:15:01 | Intel Stock Is Up 190% in 2026 and Trump Says the U.S. Has Made $30 Billion. The Early Innings for INTC May Be Over. Intel stock has surged in 2026. Here's what Intel's Q1 results reveal about what comes next. Few stocks have had a year like Intel (INTC). Shares of the chipmaker 
+E3 | 2026-05-05T23:11:28 | Stock market today: Nasdaq, S&P 500, Dow rally on rising hopes for Iran peace, upbeat tech earnings Markets are eyeing signs of easing in Mideast tensions and impressive AI-fueled tech earnings. Tech and semis are still stealing the show, but the artificial intelligence trade is 
+E4 | 2026-05-06T16:36:40 | There’s Another AI-Powered IPO in the Works. Here’s What You Should Know. AI startups like Cerebras Systems are rushing public market markets amid investor mania for related plays from power and infrastructure to chipmakers and... Planned IPOs could offer investors more ways to g
+E5 | 2026-05-05T23:11:28 | Stock market today: Nasdaq, S&P 500, Dow gain on rising hopes for Iran peace, upbeat tech earnings Markets are eyeing signs of easing in Mideast tensions and impressive AI-fueled tech earnings. Tech and semis are still stealing the show, but the artificial intelligence trade is r
+
+
+================================================================================
+TICKER: TSLA
+================================================================================
+
+--- InvestIQ Pipeline Thesis ---
+(structured citations [memo.citations]: E1, E2, E3, E4, E5 | coverage 1.00)
+(inline-prose citations: (none) | count 0)
+[ ] S/U/C   Tesla presents a compelling investment opportunity despite recent bearish trends and high volatility, as evidenced by a 30-day return of -14.7% and an annualized volatility of 45.1%.
+[ ] S/U/C   The positive sentiment score of 0.60 indicates that market perception remains optimistic about Tesla's long-term growth potential, particularly in the electric vehicle and renewable energy sectors.
+[ ] S/U/C   While the stock has experienced a maximum drawdown of -15.4% over the past month, this could create an attractive entry point for long-term investors looking to capitalize on Tesla's innovative edge and market leadership.
+[ ] S/U/C   The company's commitment to expanding production capacity and advancing technology positions it well to benefit from the ongoing transition to sustainable energy.
+[ ] S/U/C   Although the associated risks are high, with a risk score of 95/100, the potential for significant returns in a rapidly evolving market justifies a bullish stance on Tesla.
+[ ] S/U/C   As the company continues to innovate and capture market share, it is likely to rebound from current pressures, making it a strong candidate for investment.
+
+--- Baseline (Monolithic) Thesis ---
+(inline-prose citations: E3 | coverage 0.20 | count 1)
+[ ] S/U/C   Tesla, Inc. (TSLA) presents a compelling investment opportunity as it continues to lead the electric vehicle (EV) market while expanding its footprint in energy solutions and autonomous driving technology.
+[ ] S/U/C   The company's innovative approach and strong brand loyalty position it favorably against traditional automakers and emerging competitors.
+[ ] S/U/C   With the global shift towards sustainable energy and increasing regulatory support for EV adoption, Tesla is well-positioned to capture significant market share.
+[ ] S/U/C   [ ] cite-faithful? Y/N/NA   Furthermore, the recent surge in tech stocks, particularly in the semiconductor sector, highlights the growing importance of advanced technology in automotive applications, which Tesla is uniquely equipped to leverage (E3).
+[ ] S/U/C   As the company continues to invest in AI and battery technology, it is likely to enhance its competitive edge and drive long-term growth.
+[ ] S/U/C   Given its current valuation and growth potential, TSLA remains an attractive buy for investors looking to capitalize on the future of transportation and energy.
+
+--- Evidence (for reference) ---
+E1 | 2026-05-05T15:06:43 | Why Meta Stock Is Objectively Cheap at Current Levels Meta is currently trading at a P/E of 20, a valuation typical of mature industrial firms rather than tech leaders. While the market focuses on massive capex,... The last several days on the markets have been highly eventful, a
+E2 | 2026-05-06T13:15:01 | Intel Stock Is Up 190% in 2026 and Trump Says the U.S. Has Made $30 Billion. The Early Innings for INTC May Be Over. Intel stock has surged in 2026. Here's what Intel's Q1 results reveal about what comes next. Few stocks have had a year like Intel (INTC). Shares of the chipmaker 
+E3 | 2026-05-04T10:00:00 | Tech stocks today: Semiconductor company earnings in focus amid AI boom, Musk vs. Altman fight continues Tech stocks are in focus amid an earnings bonanza, layoffs, and AI spending plans. Meta (META) is acquiring AI robot company Assured Robot Intelligence, as the company looks t
+E4 | 2026-05-08T13:42:00 | Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUBAI, UAE, May 8, 2026 /PRNewswire/ -- Bybit, the world's second-largest cryptocurrency exchange by trading volume, has expanded perpetual contracts offerings to include seven new Tr
+E5 | 2026-05-08T13:12:00 | Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUBAI, UAE, May 8, 2026 /PRNewswire/ -- Bybit, the world's second-largest cryptocurrency exchange by trading volume, has expanded perpetual contracts offerings to include seven new Tr
+

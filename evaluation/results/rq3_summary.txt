@@ -1,0 +1,38 @@
+=== RQ3 SENTIMENT RESULTS ===
+Dataset: Financial PhraseBank (sentences_allagree)
+Total sentences: 2264
+
+--- Accuracy ---
+FinBERT: 0.915
+VADER:   0.571
+
+--- Macro-F1 ---
+FinBERT: 0.894
+VADER:   0.487
+
+--- Per-class F1 (negative / neutral / positive) ---
+FinBERT: 0.888 / 0.945 / 0.849
+VADER:   0.279 / 0.673 / 0.509
+
+--- Confusion Matrix: FinBERT ---
+(rows=true neg/neu/pos, cols=pred neg/neu/pos)
+          pred_neg pred_neu pred_pos
+true_neg       269       28        6
+true_neu         7     1361       23
+true_pos        27      101      442
+
+--- Confusion Matrix: VADER ---
+          pred_neg pred_neu pred_pos
+true_neg        68       83      152
+true_neu        79      805      507
+true_pos        38      112      420
+
+--- 5 Illustrative Examples (FinBERT right, VADER wrong) ---
+1. "According to Gran , the company has no plans to move all production to Russia , although that is where the company is growing ." | true=neutral | finbert=neutral | vader=negative
+2. "Net income from life insurance doubled to EUR 6.8 mn from EUR 3.2 mn , and net income from non-life insurance rose to EUR 5.2 mn from EUR 1.5 mn in the corresponding period in 2009 ." | true=positive | finbert=positive | vader=neutral
+3. "Net sales surged by 18.5 % to EUR167 .8 m. Teleste said that EUR20 .4 m , or 12.2 % , of the sales came from the acquisitions made in 2009 ." | true=positive | finbert=positive | vader=neutral
+4. "The Lithuanian beer market made up 14.41 million liters in January , a rise of 0.8 percent from the year-earlier figure , the Lithuanian Brewers ' Association reporting citing the results from its members ." | true=positive | finbert=positive | vader=neutral
+5. "In January , traffic , measured in revenue passenger kilometres RPK , went up by 3.2 % and capacity , measured in available seat kilometres ASK , rose by 12.2 % ." | true=positive | finbert=positive | vader=neutral
+
+--- Interpretation ---
+FinBERT substantially outperforms the lexicon baseline on domain-specific financial sentiment: FinBERT reaches 91.5% accuracy and 0.894 macro-F1, versus VADER's 57.1% and 0.487 — an absolute accuracy gap of 34.4%. The divergence is largest on the negative class (per-class F1 0.888 for FinBERT vs 0.279 for VADER). This reflects a fundamental limitation of general-purpose lexicons in finance: VADER keys on surface tokens such as 'profit', 'loss', 'growth', or 'decline' and so misclassifies factual, neutral financial statements as strongly positive or negative, while FinBERT — fine-tuned on financial tone — captures the reporting context and correctly assigns neutrality. For InvestIQ this confirms that a domain-adapted transformer is necessary for trustworthy sentiment signals, and justifies FinBERT's additional inference cost over a lightweight rule-based baseline.

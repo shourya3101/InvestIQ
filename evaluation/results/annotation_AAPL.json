@@ -1,0 +1,65 @@
+{
+  "ticker": "AAPL",
+  "evidence": [
+    {
+      "id": "E1",
+      "snippet": "Apple Hammers The Competition The gold standard of smartphone industry research is CounterPoint. It recently released its report on global first-quarter sales. One point is that the top... Quick Read\r\n<ul><li>iPhone 17 Dominates\r\n</li><li>Samsung Runs Far Behind\r\n</li><li>Lack Of",
+      "date": "2026-05-05T15:48:59"
+    },
+    {
+      "id": "E2",
+      "snippet": "Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUBAI, UAE, May 8, 2026 /PRNewswire/ -- Bybit, the world's second-largest cryptocurrency exchange by trading volume, has expanded perpetual contracts offerings to include seven new Tr",
+      "date": "2026-05-08T13:42:00"
+    },
+    {
+      "id": "E3",
+      "snippet": "Bybit Introduces 24/7 TradFi Perpetual Contracts Trading for Dozens of US Stocks and Global ETFs DUBAI, UAE, May 8, 2026 /PRNewswire/ -- Bybit, the world's second-largest cryptocurrency exchange by trading volume, has expanded perpetual contracts offerings to include seven new Tr",
+      "date": "2026-05-08T13:12:00"
+    },
+    {
+      "id": "E4",
+      "snippet": "Corning Stock Is Surging on a Major Nvidia Deal: ‘AI Is Not Just a Technology Story, It Is a Manufacturing Story’ Shares of the glassmaking company were up a substantial 12% on the news. Corning (GLW), best known for making the glass on iPhone screens, saw its shares rally by 12%",
+      "date": "2026-05-07T15:05:56"
+    },
+    {
+      "id": "E5",
+      "snippet": "Intel's Stock Surges to Fresh High on Deal Talks. Could Apple Be Its Next Customer? Intel shares soared to a fresh high Tuesday following a report that Apple held early talks with the chipmaker. With Tuesday's gains, Intel shares have nearly tripled in value since the start of th",
+      "date": "2026-05-05T16:07:00"
+    }
+  ],
+  "investiq_structured_citations": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
+  "investiq": {
+    "thesis": "Apple Inc. presents a compelling investment opportunity despite recent bearish trends and moderate risk indicators. The company's strong brand loyalty and innovative product pipeline continue to position it favorably in the competitive smartphone market, as evidenced by its leading sales performance reported by CounterPoint. While the stock has experienced a 30-day return of -5.0% and a maximum drawdown of -12.7%, the positive sentiment score of 0.80 suggests that investor confidence remains intact. Furthermore, ongoing discussions with Intel regarding potential collaborations could enhance Apple's technological edge and operational efficiency. The current volatility of 29.0% reflects market uncertainty, but it also presents a buying opportunity for long-term investors. Overall, Apple’s robust fundamentals and strategic initiatives indicate that it is well-positioned for future growth, making it a worthwhile addition to an equity portfolio.",
+    "inline_prose_citations": [],
+    "inline_prose_citation_count": 0,
+    "citation_coverage": 1.0,
+    "total_claims": 6,
+    "unsupported_claims": 4,
+    "contradicted_claims": 0,
+    "cited_claims": 0,
+    "cite_faithful": 0,
+    "cite_unfaithful": 0
+  },
+  "baseline": {
+    "thesis": "**Investment Thesis for Apple Inc. (AAPL)**\n\nApple Inc. continues to solidify its dominance in the smartphone market, as evidenced by the recent CounterPoint report highlighting the iPhone 17's exceptional sales performance, which has left competitors like Samsung trailing significantly (E1). This strong market position is further supported by the company's strategic partnerships, such as potential collaborations with Intel, which could enhance its chip supply chain and innovation capabilities (E5). Additionally, the ongoing demand for Apple products is bolstered by the increasing integration of advanced technologies, including AI, as seen in the rising fortunes of suppliers like Corning, which benefits from Apple's hardware needs (E4). With a robust ecosystem of services and products, coupled with a loyal customer base, Apple is well-positioned for sustained growth. Given these factors, we believe AAPL represents a compelling investment opportunity, with potential for significant upside as it continues to innovate and capture market share.",
+    "inline_prose_citations": [
+      "E1",
+      "E5",
+      "E4"
+    ],
+    "inline_prose_citation_count": 3,
+    "citation_coverage": 0.6,
+    "total_claims": 5,
+    "unsupported_claims": 3,
+    "contradicted_claims": 0,
+    "cited_claims": 3,
+    "cite_faithful": 2,
+    "cite_unfaithful": 1
+  }
+}
